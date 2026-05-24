@@ -1,691 +1,1009 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RDC Learning Arena</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --green:        #1DB347;
-      --green-dark:   #178A37;
-      --green-deeper: #0F6428;
-      --green-light:  #F0FBF3;
-      --green-mid:    #D1F0DA;
-      --navy:         #1A2A3A;
-      --navy-mid:     #2C3E50;
-      --grey-dark:    #4A5568;
-      --grey-mid:     #718096;
-      --grey-light:   #E2E8F0;
-      --grey-bg:      #F7F8FA;
-      --white:        #FFFFFF;
-      --shadow-sm:    0 2px 8px rgba(0,0,0,0.08);
-      --shadow-md:    0 8px 30px rgba(0,0,0,0.12);
-      --shadow-lg:    0 20px 60px rgba(0,0,0,0.15);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Open Sans', sans-serif;
-      background: var(--white);
-      color: var(--navy);
-    }
-
-    /* ── HEADER ── */
-    header {
-      background: var(--white);
-      border-bottom: 3px solid var(--green);
-      padding: 0 40px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-    }
-
-    .header-logo img {
-      height: 42px;
-      width: auto;
-      object-fit: contain;
-    }
-
-    .header-divider {
-      width: 1px;
-      height: 32px;
-      background: var(--grey-light);
-    }
-
-    .header-portal-label {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--green);
-    }
-
-    .header-link {
-      font-size: 13px;
-      color: var(--grey-mid);
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-    .header-link:hover { color: var(--green); }
-
-    /* ── HERO ── */
-    .hero {
-      background: linear-gradient(135deg, #0a1f0d 0%, #0f2d14 50%, #0d261a 100%);
-      padding: 90px 40px 80px;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-    }
-
-    /* grid pattern */
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(29,179,71,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(29,179,71,0.06) 1px, transparent 1px);
-      background-size: 48px 48px;
-    }
-
-    /* green bottom accent */
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--green-deeper), var(--green), #5DD882, var(--green), var(--green-deeper));
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 0 auto;
-    }
-
-    .hero-logo-wrap {
-      margin-bottom: 36px;
-      animation: fadeDown 0.7s ease both;
-    }
-
-    .hero-logo-wrap img {
-      height: 54px;
-      width: auto;
-      filter: brightness(0) invert(1);
-      opacity: 0.95;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(29,179,71,0.15);
-      border: 1px solid rgba(29,179,71,0.45);
-      border-radius: 100px;
-      padding: 6px 16px;
-      margin-bottom: 24px;
-      animation: fadeDown 0.7s 0.1s ease both;
-    }
-
-    .hero-badge-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 2s ease infinite;
-    }
-
-    .hero-badge span {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #7EE89A;
-    }
-
-    .hero-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: clamp(38px, 6vw, 68px);
-      font-weight: 900;
-      color: var(--white);
-      line-height: 1.05;
-      letter-spacing: -1px;
-      margin-bottom: 20px;
-      animation: fadeDown 0.7s 0.15s ease both;
-    }
-
-    .hero-title em {
-      font-style: normal;
-      color: var(--green);
-    }
-
-    .hero-subtitle {
-      font-size: 16px;
-      color: rgba(255,255,255,0.62);
-      line-height: 1.8;
-      max-width: 540px;
-      margin: 0 auto 40px;
-      font-weight: 300;
-      animation: fadeDown 0.7s 0.2s ease both;
-    }
-
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--green);
-      color: white;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 14px 32px;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.2s;
-      animation: fadeDown 0.7s 0.25s ease both;
-    }
-
-    .hero-cta:hover {
-      background: var(--green-dark);
-      transform: translateY(-2px);
-    }
-
-    /* ── STATS ── */
-    .stats-strip {
-      background: var(--white);
-      border-bottom: 1px solid var(--grey-light);
-      padding: 28px 40px;
-    }
-
-    .stats-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .stat-item {
-      text-align: center;
-      padding: 8px 48px;
-      border-right: 1px solid var(--grey-light);
-    }
-
-    .stat-item:last-child { border-right: none; }
-
-    .stat-num {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--green);
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--grey-mid);
-      margin-top: 4px;
-    }
-
-    /* ── GAMES SECTION ── */
-    .games-section {
-      background: var(--grey-bg);
-      padding: 72px 40px 90px;
-    }
-
-    .section-top {
-      max-width: 1200px;
-      margin: 0 auto 52px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 8px;
-    }
-
-    .section-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 34px;
-      font-weight: 800;
-      color: var(--navy);
-    }
-
-    .section-count {
-      font-size: 13px;
-      color: var(--grey-mid);
-      font-weight: 600;
-    }
-
-    /* ── CARDS ── */
-    .cards-grid {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 28px;
-    }
-
-    .card {
-      background: var(--white);
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--grey-light);
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
-      opacity: 0;
-      transform: translateY(24px);
-      animation: cardIn 0.5s ease forwards;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .card:nth-child(1) { animation-delay: 0.1s; }
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.3s; }
-
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    /* top accent bar that fills on hover */
-    .card-bar {
-      height: 4px;
-      background: var(--grey-light);
-      transition: background 0.3s;
-    }
-    .card:hover .card-bar { background: var(--green); }
-
-    /* card visual */
-    .card-visual {
-      height: 148px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .card-visual-1 { background: linear-gradient(135deg, #F0FBF3 0%, #D1F0DA 100%); }
-    .card-visual-2 { background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); }
-    .card-visual-3 { background: linear-gradient(135deg, #FFF8F0 0%, #FDE8D0 100%); }
-
-    .card-visual::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
-      background-size: 18px 18px;
-    }
-
-    .card-num {
-      position: absolute;
-      right: 14px;
-      bottom: 4px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 80px;
-      font-weight: 900;
-      color: rgba(0,0,0,0.04);
-      line-height: 1;
-    }
-
-    .card-icon-wrap {
-      position: relative;
-      z-index: 1;
-      width: 66px;
-      height: 66px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover .card-icon-wrap { transform: scale(1.08) rotate(-3deg); }
-
-    .icon-green  { background: var(--green); }
-    .icon-blue   { background: #4F46E5; }
-    .icon-amber  { background: #D97706; }
-
-    /* card body */
-    .card-body {
-      padding: 22px 24px 14px;
-      flex: 1;
-    }
-
-    .card-tag {
-      display: inline-block;
-      background: var(--green-light);
-      color: var(--green-deeper);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 100px;
-      margin-bottom: 12px;
-    }
-
-    .card-tag-blue  { background: #EEF2FF; color: #4338CA; }
-    .card-tag-amber { background: #FFFBEB; color: #92400E; }
-
-    .card-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--navy);
-      margin-bottom: 10px;
-    }
-
-    .card-desc {
-      font-size: 13.5px;
-      color: var(--grey-dark);
-      line-height: 1.75;
-    }
-
-    /* card footer */
-    .card-footer {
-      padding: 14px 24px 20px;
-      border-top: 1px solid var(--grey-light);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .card-url {
-      font-size: 11px;
-      color: #A0AEC0;
-      font-family: monospace;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 160px;
-    }
-
-    .launch-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--green);
-      color: white;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 9px 18px;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.2s;
-      flex-shrink: 0;
-    }
-
-    .launch-btn:hover {
-      background: var(--green-dark);
-      transform: scale(1.03);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--navy);
-      border-top: 4px solid var(--green);
-      padding: 40px;
-      text-align: center;
-    }
-
-    .footer-logo img {
-      height: 36px;
-      filter: brightness(0) invert(1);
-      opacity: 0.85;
-      margin-bottom: 12px;
-    }
-
-    .footer-tagline {
-      font-size: 12px;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: 1px;
-      margin-bottom: 20px;
-    }
-
-    .footer-divider {
-      width: 40px;
-      height: 2px;
-      background: var(--green);
-      margin: 0 auto 20px;
-    }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .footer-links a {
-      font-size: 12px;
-      color: rgba(255,255,255,0.4);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--green); }
-
-    .footer-copy {
-      font-size: 11px;
-      color: rgba(255,255,255,0.25);
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes cardIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(1.4); }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      header { padding: 0 20px; }
-      .hero { padding: 60px 24px 60px; }
-      .stat-item { padding: 8px 24px; }
-      .games-section { padding: 48px 20px 60px; }
-      footer { padding: 32px 24px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. K.S. Bhoon — People Scientist | Leadership | AI Pioneer</title>
+    <meta name="description" content="Dr. K.S. Bhoon — Former Brigadier, People Scientist, and AI Pioneer. Building systems and people at RDC Concrete.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy:    #1B2B4B;
+            --navy-lt: #243660;
+            --gold:    #C8902A;
+            --gold-lt: #E8B04A;
+            --green:   #2D7A47;
+            --cream:   #FAF9F6;
+            --sand:    #F0EBE0;
+            --char:    #2C2C2C;
+            --muted:   #666;
+            --border:  #E0D8CC;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Source Serif 4', Georgia, serif;
+            color: var(--char);
+            background: var(--cream);
+            line-height: 1.7;
+        }
+
+        /* ── NAV ─────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 66px;
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(200,144,42,0.35);
+        }
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-family: 'Montserrat', sans-serif;
+            color: rgba(255,255,255,0.72);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--gold); }
+        .nav-apps {
+            font-family: 'Montserrat', sans-serif;
+            background: transparent;
+            border: 1px solid rgba(200,144,42,0.55);
+            color: var(--gold);
+            padding: 8px 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-apps:hover { background: var(--gold); color: var(--navy); }
+
+        /* ── HERO ────────────────────────────────── */
+        .hero {
+            margin-top: 66px;
+            display: grid;
+            grid-template-columns: 42% 58%;
+            min-height: calc(100vh - 66px);
+        }
+        .hero-left {
+            background: var(--navy);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 15%;
+            display: block;
+            filter: brightness(0.82) contrast(1.06) saturate(0.88);
+        }
+        .hero-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(transparent 0%, rgba(27,43,75,0.96) 100%);
+            padding: 60px 40px 40px;
+        }
+        .hero-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+        .hero-rule {
+            width: 52px;
+            height: 2px;
+            background: var(--gold);
+            margin: 14px 0;
+        }
+        .hero-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.68);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+        .hero-right {
+            background: var(--cream);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 72px;
+        }
+        .hero-qmark {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            color: var(--gold);
+            line-height: 0.7;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        .hero-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.65rem;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--navy);
+            line-height: 1.58;
+            margin-bottom: 32px;
+        }
+        .hero-bio {
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.85;
+            max-width: 520px;
+        }
+        .hero-cta {
+            display: inline-block;
+            margin-top: 40px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--navy);
+            text-decoration: none;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 3px;
+            transition: color 0.2s;
+        }
+        .hero-cta:hover { color: var(--gold); }
+
+        /* ── STATS STRIP ─────────────────────────── */
+        .stats-strip {
+            background: var(--navy);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 3px solid var(--gold);
+        }
+        .stat-item {
+            padding: 28px 20px;
+            text-align: center;
+            border-right: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-number {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .stat-label {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.64rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.52);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* ── SHARED ──────────────────────────────── */
+        section { padding: 96px 0; }
+        .container { max-width: 1160px; margin: 0 auto; padding: 0 48px; }
+        .s-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+        .s-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.25;
+        }
+        .s-rule {
+            width: 48px;
+            height: 2px;
+            background: var(--gold);
+            margin: 22px 0 28px;
+        }
+        .s-sub {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 560px;
+            line-height: 1.85;
+        }
+
+        /* ── PHILOSOPHY ──────────────────────────── */
+        .philosophy { background: var(--cream); }
+        .philo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 60px;
+        }
+        .philo-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 40px 32px;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.25s;
+        }
+        .philo-card:hover { box-shadow: 0 6px 28px rgba(27,43,75,0.09); }
+        .philo-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 3px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+        .philo-card:hover::after { width: 100%; }
+        .philo-icon { width: 44px; height: 44px; margin-bottom: 24px; }
+        .philo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+        }
+        .philo-text { font-size: 1.02rem; color: var(--muted); line-height: 1.82; }
+
+        /* ── JOURNEY ─────────────────────────────── */
+        .journey { background: var(--sand); }
+        .journey-top {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 72px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+        .journey-img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            object-position: center 18%;
+            filter: grayscale(12%) brightness(0.95);
+            border-left: 4px solid var(--gold);
+        }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 10%; right: 10%;
+            height: 1px;
+            background: var(--gold);
+            opacity: 0.3;
+        }
+        .tl-item { text-align: center; padding: 0 12px; }
+        .tl-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--gold);
+            margin: 0 auto 24px;
+            position: relative; z-index: 1;
+        }
+        .tl-year {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+        .tl-tag {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.74rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        .tl-desc { font-size: 0.96rem; color: var(--muted); line-height: 1.68; }
+
+        /* ── WHO I DEVELOP ───────────────────────── */
+        .people { background: #fff; }
+        .people-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 72px;
+            align-items: start;
+        }
+        .people-cards { display: flex; flex-direction: column; gap: 18px; margin-top: 48px; }
+        .pc {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 24px;
+            background: var(--cream);
+            border-left: 3px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .pc:hover { border-left-color: var(--gold); }
+        .pc-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+        .pc-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+        .pc-text { font-size: 1.0rem; color: var(--muted); line-height: 1.78; }
+        .pq-block { background: var(--navy); padding: 48px; }
+        .pq-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            font-style: italic;
+            color: #fff;
+            line-height: 1.72;
+            margin-bottom: 18px;
+        }
+        .pq-attr {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 28px;
+        }
+        .pq-note { font-size: 1.0rem; color: rgba(255,255,255,0.6); line-height: 1.82; }
+
+        /* ── AI VISION ───────────────────────────── */
+        .ai-vision { background: var(--navy); padding: 96px 0; }
+        .ai-vision .s-label { color: var(--gold-lt); }
+        .ai-vision .s-title { color: #fff; }
+        .ai-vision .s-rule { background: rgba(200,144,42,0.45); }
+        .ai-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.85rem;
+            font-style: italic;
+            color: #fff;
+            line-height: 1.52;
+            max-width: 720px;
+            margin: 48px 0 10px;
+        }
+        .ai-attr {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 52px;
+        }
+        .ai-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .ai-tag {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            border: 1px solid rgba(200,144,42,0.35);
+            color: rgba(255,255,255,0.72);
+        }
+
+        /* ── PEOPLE ARCHITECTURE ────────────────────── */
+        .people-arch { background: var(--navy); padding: 96px 0; }
+        .people-arch .s-label { color: var(--gold-lt); }
+        .people-arch .s-title { color: #fff; }
+        .people-arch .s-rule { background: rgba(200,144,42,0.45); }
+        .people-arch .s-sub { color: rgba(255,255,255,0.65); max-width: 660px; }
+
+        .gptw-strip {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            margin: 48px 0 56px;
+            border: 1px solid rgba(200,144,42,0.22);
+        }
+        .gptw-item {
+            text-align: center;
+            padding: 24px 12px;
+            border-right: 1px solid rgba(200,144,42,0.18);
+        }
+        .gptw-item:last-child { border-right: none; }
+        .gptw-num {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 6px;
+        }
+        .gptw-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.67rem;
+            color: rgba(255,255,255,0.52);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            line-height: 1.55;
+        }
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 40px;
+        }
+        .arch-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(200,144,42,0.18);
+            padding: 28px;
+        }
+        .arch-card-head {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.12rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(200,144,42,0.18);
+        }
+        .arch-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .arch-list li {
+            font-size: 0.94rem;
+            color: rgba(255,255,255,0.68);
+            line-height: 1.62;
+            padding-left: 16px;
+            position: relative;
+        }
+        .arch-list li::before {
+            content: '\B7';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-size: 1.3rem;
+            line-height: 1.2;
+        }
+        .arch-list strong { color: #fff; font-weight: 600; }
+        .awards-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 28px;
+            margin-top: 40px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(200,144,42,0.18);
+        }
+        .award-item {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.73rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.58);
+            letter-spacing: 0.04em;
+        }
+
+        /* ── TOOLS ───────────────────────────────── */
+        .tools { background: var(--cream); padding: 64px 0; }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+        .tool-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 28px 28px 24px;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.2s;
+        }
+        .tool-card:hover { box-shadow: 0 4px 20px rgba(27,43,75,0.07); }
+        .tool-num {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+        .tool-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+        .tool-type {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.73rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--green);
+            margin-bottom: 14px;
+        }
+        .tool-desc { font-size: 0.98rem; color: var(--muted); line-height: 1.78; flex: 1; margin-bottom: 22px; }
+        .tool-link {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--navy);
+            text-decoration: none;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 2px;
+            align-self: flex-start;
+            transition: color 0.2s;
+        }
+        .tool-link:hover { color: var(--gold); }
+
+        /* ── FOOTER ──────────────────────────────── */
+        footer {
+            background: #111827;
+            padding: 44px 0;
+            border-top: 3px solid var(--gold);
+        }
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .footer-tag {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.32);
+        }
+        .footer-links { display: flex; gap: 28px; }
+        .footer-links a {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.42);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--gold); }
+        .footer-copy {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.22);
+        }
+
+        /* ── RESPONSIVE ──────────────────────────── */
+        @media (max-width: 960px) {
+            nav { padding: 0 24px; }
+            .nav-links { display: none; }
+            .hero { grid-template-columns: 1fr; }
+            .hero-left { height: 72vw; max-height: 520px; }
+            .hero-right { padding: 48px 32px; }
+            .hero-quote { font-size: 1.4rem; }
+            .stats-strip { grid-template-columns: repeat(2, 1fr); }
+            .philo-grid { grid-template-columns: 1fr; gap: 20px; }
+            .journey-top { grid-template-columns: 1fr; gap: 40px; }
+            .timeline { grid-template-columns: repeat(2, 1fr); gap: 40px 20px; }
+            .timeline::before { display: none; }
+            .people-layout { grid-template-columns: 1fr; gap: 32px; }
+            .gptw-strip { grid-template-columns: repeat(3, 1fr); }
+            .arch-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .footer-inner { flex-direction: column; gap: 20px; text-align: center; }
+            .footer-links { justify-content: center; }
+            .container { padding: 0 24px; }
+            section { padding: 64px 0; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="header-inner">
-      <a href="https://www.rdc.in" class="header-logo" target="_blank">
-        <img src="https://www.rdc.in/img/logo.png" alt="RDC Concrete Logo" />
-        <div class="header-divider"></div>
-        <span class="header-portal-label">Learning Arena</span>
-      </a>
-      <a href="https://www.rdc.in" class="header-link" target="_blank">Visit rdc.in →</a>
+<!-- NAV -->
+<nav>
+    <a href="#" class="nav-brand">Dr. K.S. Bhoon</a>
+    <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#philosophy">Philosophy</a></li>
+        <li><a href="#journey">Journey</a></li>
+        <li><a href="#architecture">People</a></li>
+        <li><a href="#ai">AI Vision</a></li>
+    </ul>
+    <a href="#tools" class="nav-apps">Apps ↗</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="about">
+    <div class="hero-left">
+        <img src="images/hero.jpg" alt="Dr. K.S. Bhoon" class="hero-photo">
+        <div class="hero-overlay">
+            <div class="hero-name">Dr. K.S. Bhoon</div>
+            <div class="hero-rule"></div>
+            <div class="hero-subtitle">Brigadier (Retd.)&nbsp;&nbsp;·&nbsp;&nbsp;People Scientist&nbsp;&nbsp;·&nbsp;&nbsp;AI Pioneer</div>
+        </div>
     </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-logo-wrap">
-        <img src="https://www.rdc.in/img/logo.png" alt="RDC Concrete" />
-      </div>
-      <div class="hero-badge">
-        <div class="hero-badge-dot"></div>
-        <span>Learning &amp; Development Portal</span>
-      </div>
-      <h1 class="hero-title"><em>RDC</em> <span style="color:var(--white);">Learning<br/>Arena</span></h1>
-      <p class="hero-subtitle">
-        Sharpen your skills, test your knowledge, and compete with peers — 
-        interactive learning tools built for RDC's 1,500+ people across 140+ plants.
-      </p>
-      <a href="#games" class="hero-cta">Explore Tools ↓</a>
+    <div class="hero-right">
+        <div class="hero-qmark">"</div>
+        <blockquote class="hero-quote">
+            Building people who build systems — that is the only leadership that lasts.
+        </blockquote>
+        <p class="hero-bio">
+            A former Brigadier in the Indian Army (1970–2002), PhD from IIT Delhi, and alumnus of the Defence Services Staff College, Dr. Bhoon has led people and operations across Ashok Leyland, ACC Concrete, and now RDC Concrete — where as Chief Operating and Technology Officer, the RDC team has together delivered ~25% CAGR growth. He blends military precision with warm mentorship and a builder's instinct for AI-powered systems.
+        </p>
+        <a href="#philosophy" class="hero-cta">Explore his philosophy ↓</a>
     </div>
-  </section>
+</div>
 
-  <!-- STATS -->
-  <div class="stats-strip">
-    <div class="stats-inner">
-      <div class="stat-item">
-        <div class="stat-num">140+</div>
-        <div class="stat-label">Plants</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">1,500+</div>
-        <div class="stat-label">Employees</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Learning Tools</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">Pan India</div>
-        <div class="stat-label">Reach</div>
-      </div>
+<!-- STATS -->
+<div class="stats-strip">
+    <div class="stat-item">
+        <span class="stat-number">140+</span>
+        <span class="stat-label">Plants Across India</span>
     </div>
-  </div>
-
-  <!-- GAMES -->
-  <section class="games-section" id="games">
-    <div class="section-top">
-      <div>
-        <p class="section-label">Interactive Tools</p>
-        <h2 class="section-title">Choose Your Arena</h2>
-      </div>
-      <span class="section-count">3 tools available</span>
+    <div class="stat-item">
+        <span class="stat-number">1,500+</span>
+        <span class="stat-label">Employees</span>
     </div>
-
-    <div class="cards-grid">
-
-      <!-- Card 1: RDC Assessments -->
-      <a class="card" href="https://rdc-assessments-production.up.railway.app" target="_blank">
-        <div class="card-bar"></div>
-        <div class="card-visual card-visual-1">
-          <div class="card-num">01</div>
-          <div class="card-icon-wrap icon-green">📋</div>
-        </div>
-        <div class="card-body">
-          <span class="card-tag">Trainee Evaluation</span>
-          <h3 class="card-title">RDC Assessments</h3>
-          <p class="card-desc">
-            AI-powered monthly progress evaluation for GETs and DETs. Submit reports, receive structured SARTAJ-based feedback, and track development milestones across your training journey.
-          </p>
-        </div>
-        <div class="card-footer">
-          <span class="card-url">rdc-assessments-production…</span>
-          <span class="launch-btn">Launch →</span>
-        </div>
-      </a>
-
-      <!-- Card 2: Business Simulation -->
-      <a class="card" href="https://business-simulation-game-v3-production.up.railway.app" target="_blank">
-        <div class="card-bar"></div>
-        <div class="card-visual card-visual-2">
-          <div class="card-num">02</div>
-          <div class="card-icon-wrap icon-blue">🏗️</div>
-        </div>
-        <div class="card-body">
-          <span class="card-tag card-tag-blue">Strategy Game</span>
-          <h3 class="card-title">Business Simulation</h3>
-          <p class="card-desc">
-            Run a virtual RMC plant and compete in a live market. Price your concrete, manage costs, win orders, and outperform rivals — a multiplayer strategy game mirroring real RMC business decisions.
-          </p>
-        </div>
-        <div class="card-footer">
-          <span class="card-url">business-simulation-game-v3…</span>
-          <span class="launch-btn">Launch →</span>
-        </div>
-      </a>
-
-      <!-- Card 3: RDC DISHA Biz Quiz -->
-      <a class="card" href="https://web-production-518adb.up.railway.app" target="_blank">
-        <div class="card-bar"></div>
-        <div class="card-visual card-visual-3">
-          <div class="card-num">03</div>
-          <div class="card-icon-wrap icon-amber">🧠</div>
-        </div>
-        <div class="card-body">
-          <span class="card-tag card-tag-amber">Knowledge Quiz</span>
-          <h3 class="card-title">RDC DISHA Biz Quiz</h3>
-          <p class="card-desc">
-            Test your mastery of RMC operations, quality standards, and safety protocols. Timed multiple-choice questions with instant scoring — the DISHA quiz platform for RDC employees.
-          </p>
-        </div>
-        <div class="card-footer">
-          <span class="card-url">web-production-518adb…</span>
-          <span class="launch-btn">Launch →</span>
-        </div>
-      </a>
-
+    <div class="stat-item">
+        <span class="stat-number">35+</span>
+        <span class="stat-label">Years of Leadership</span>
     </div>
-  </section>
+    <div class="stat-item">
+        <span class="stat-number">3</span>
+        <span class="stat-label">AI Learning Platforms</span>
+    </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">
-      <img src="https://www.rdc.in/img/logo.png" alt="RDC Concrete" />
+<!-- PHILOSOPHY -->
+<section class="philosophy" id="philosophy">
+    <div class="container">
+        <div class="s-label">Core Beliefs</div>
+        <h2 class="s-title">People Science.<br>Precision. Progress.</h2>
+        <div class="s-rule"></div>
+        <p class="s-sub">Three disciplines — interlocked. Every system Dr. Bhoon builds begins with people, is measured with data, and is sustained through ownership.</p>
+
+        <div class="philo-grid">
+            <div class="philo-card">
+                <svg class="philo-icon" viewBox="0 0 44 44" fill="none">
+                    <circle cx="22" cy="13" r="7" stroke="#C8902A" stroke-width="1.4"/>
+                    <path d="M6 38c0-8.837 7.163-16 16-16s16 7.163 16 16" stroke="#1B2B4B" stroke-width="1.4" stroke-linecap="round"/>
+                    <path d="M30 10l6-6M32 4h4v4" stroke="#C8902A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="philo-title">Leadership &amp; Ownership</div>
+                <p class="philo-text">Military discipline meets commercial sharpness. Dr. Bhoon's leadership is rooted in execution excellence, frontline empowerment, and radical accountability — not hierarchy for its own sake. He prefers sharp, data-backed insights over commentary.</p>
+            </div>
+            <div class="philo-card">
+                <svg class="philo-icon" viewBox="0 0 44 44" fill="none">
+                    <rect x="6" y="28" width="7" height="10" stroke="#1B2B4B" stroke-width="1.4"/>
+                    <rect x="18" y="20" width="7" height="18" stroke="#1B2B4B" stroke-width="1.4"/>
+                    <rect x="30" y="12" width="7" height="26" stroke="#1B2B4B" stroke-width="1.4"/>
+                    <path d="M6 22l12-8 12 5 8-12" stroke="#C8902A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="philo-title">Operational Excellence</div>
+                <p class="philo-text">From diesel costs and cycle times to EBITDA and ERP accuracy — he dives into the granular to drive the material. Preventive maintenance, vendor discipline, and real-time data are his instruments of choice.</p>
+            </div>
+            <div class="philo-card">
+                <svg class="philo-icon" viewBox="0 0 44 44" fill="none">
+                    <circle cx="22" cy="22" r="13" stroke="#1B2B4B" stroke-width="1.4"/>
+                    <circle cx="22" cy="22" r="4" stroke="#C8902A" stroke-width="1.4"/>
+                    <path d="M22 9v4M22 31v4M9 22h4M31 22h4" stroke="#C8902A" stroke-width="1.4" stroke-linecap="round"/>
+                    <path d="M14 14l2.8 2.8M27.2 27.2L30 30M30 14l-2.8 2.8M16.8 27.2L14 30" stroke="#C8902A" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+                <div class="philo-title">AI-Powered Mentorship</div>
+                <p class="philo-text">Voice assessments, scenario simulations, SARTAJ scoring — Dr. Bhoon is building the infrastructure to develop thousands of frontline workers with the precision and empathy of a one-on-one mentor.</p>
+            </div>
+        </div>
     </div>
-    <p class="footer-tagline">RDC Concrete (India) Limited · bhoon.org</p>
-    <div class="footer-divider"></div>
-    <div class="footer-links">
-      <a href="https://www.rdc.in" target="_blank">Main Website</a>
-      <a href="https://www.rdc.in/careers" target="_blank">Careers</a>
-      <a href="https://www.rdc.in/contactus" target="_blank">Contact</a>
-      <a href="https://www.rdc.in/privacy-policy" target="_blank">Privacy Policy</a>
+</section>
+
+<!-- JOURNEY -->
+<section class="journey" id="journey">
+    <div class="container">
+        <div class="journey-top">
+            <div>
+                <div class="s-label">The Journey</div>
+                <h2 class="s-title">From Kargil<br>to the Cloud</h2>
+                <div class="s-rule"></div>
+                <p class="s-sub">Five decades of building — first in olive green, then in boardrooms across Ashok Leyland and ACC, and now in code, data, and AI. The discipline never changed; only the battlefield did.</p>
+                <br>
+                <p class="s-sub" style="font-style:italic; color:#999; font-size:0.95rem;">PhD, IIT Delhi · Defence Services Staff College · Director, Robo Silicon</p>
+            </div>
+            <img src="images/speaking.jpg" alt="Dr. Bhoon addressing a leadership gathering" class="journey-img">
+        </div>
+
+        <div class="timeline">
+            <div class="tl-item">
+                <span class="tl-year">1970</span>
+                <div class="tl-dot"></div>
+                <span class="tl-tag">Indian Army</span>
+                <p class="tl-desc">Commissioned as an officer. Rose to Brigadier through engineering, logistics, and strategic roles — including operational command during Kargil (1999).</p>
+            </div>
+            <div class="tl-item">
+                <span class="tl-year">2002</span>
+                <div class="tl-dot"></div>
+                <span class="tl-tag">Ashok Leyland</span>
+                <p class="tl-desc">Director, Management Development Centre. Built leadership pipelines and founded the Ashok Leyland Virtual University — one of India's earliest corporate learning platforms.</p>
+            </div>
+            <div class="tl-item">
+                <span class="tl-year">2008</span>
+                <div class="tl-dot"></div>
+                <span class="tl-tag">ACC Concrete</span>
+                <p class="tl-desc">Head – Training &amp; Development, then Chief People Officer. Led the turnaround of a loss-making operation to profitability through people and OD strategy.</p>
+            </div>
+            <div class="tl-item">
+                <span class="tl-year">2016</span>
+                <div class="tl-dot"></div>
+                <span class="tl-tag">RDC Concrete</span>
+                <p class="tl-desc">Chief Operating &amp; Technology Officer. The RDC team has grown together at ~25% CAGR — through shared ownership of operations, technology, and people across 140+ plants. MoU with BITS Pilani for MBA &amp; B.Tech programs.</p>
+            </div>
+            <div class="tl-item">
+                <span class="tl-year">2023+</span>
+                <div class="tl-dot"></div>
+                <span class="tl-tag">AI Pioneer</span>
+                <p class="tl-desc">AI-powered LMS, voice assessments, business simulations, customer service platforms, Know Yourself tools, and operational automation — scaling mentorship to 1,500+ people.</p>
+            </div>
+        </div>
     </div>
-    <p class="footer-copy">© 2026 RDC Concrete (India) Limited. All Rights Reserved.</p>
-  </footer>
+</section>
+
+<!-- WHO I DEVELOP -->
+<section class="people" id="people">
+    <div class="container">
+        <div class="people-layout">
+            <div>
+                <div class="s-label">People Science in Action</div>
+                <h2 class="s-title">Who I Develop</h2>
+                <div class="s-rule"></div>
+                <p class="s-sub">Dr. Bhoon believes hungry, hardworking candidates outlast pedigreed ones. He builds tools that stretch people — not sort them.</p>
+                <div class="people-cards">
+                    <div class="pc">
+                        <span class="pc-icon">⚙️</span>
+                        <div>
+                            <div class="pc-title">Plant Operators &amp; Batchers</div>
+                            <p class="pc-text">The frontline engine of RMC. Dr. Bhoon builds competency frameworks, practical assessments, and AI feedback loops tailored to their real-world challenges.</p>
+                        </div>
+                    </div>
+                    <div class="pc">
+                        <span class="pc-icon">🎓</span>
+                        <div>
+                            <div class="pc-title">GETs &amp; DETs</div>
+                            <p class="pc-text">Graduate and Diploma Engineer Trainees evaluated through SARTAJ — an AI-integrated scoring system delivering sharp, personalised feedback on operational scenarios.</p>
+                        </div>
+                    </div>
+                    <div class="pc">
+                        <span class="pc-icon">🚀</span>
+                        <div>
+                            <div class="pc-title">Future Leaders</div>
+                            <p class="pc-text">Business simulation games, strategy challenges, and accountability frameworks for those hungry to own their plant's P&amp;L — not just manage it.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pq-block">
+                <p class="pq-text">"I look for hunger and resilience — not pedigree. Attitude is the only currency that compounds."</p>
+                <div class="pq-attr">— Dr. K.S. Bhoon</div>
+                <p class="pq-note">This belief shapes every assessment tool he builds — from the questions asked to the way feedback is delivered. The system must stretch people, not sort them. Identify the hungry ones early. Give them the tools, the accountability, and the room to grow.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PEOPLE ARCHITECTURE -->
+<section class="people-arch" id="architecture">
+    <div class="container">
+        <div class="s-label">People Architecture</div>
+        <h2 class="s-title">A Great Place to Work.<br>By Design.</h2>
+        <div class="s-rule"></div>
+        <p class="s-sub">Six consecutive GPTW certifications. A culture built on ISHQ, RISHTEY, and a people philosophy that runs from campus hiring to off-roll absorption — touching every person, every week.</p>
+
+        <div class="gptw-strip">
+            <div class="gptw-item">
+                <span class="gptw-num">6</span>
+                <span class="gptw-label">Consecutive GPTW<br>Certifications</span>
+            </div>
+            <div class="gptw-item">
+                <span class="gptw-num">92%</span>
+                <span class="gptw-label">GPTW<br>Score</span>
+            </div>
+            <div class="gptw-item">
+                <span class="gptw-num">81</span>
+                <span class="gptw-label">Net Promoter<br>Score</span>
+            </div>
+            <div class="gptw-item">
+                <span class="gptw-num">5%</span>
+                <span class="gptw-label">Mid &amp; Senior<br>Attrition</span>
+            </div>
+            <div class="gptw-item">
+                <span class="gptw-num">80%</span>
+                <span class="gptw-label">Leaders Promoted<br>Internally</span>
+            </div>
+        </div>
+
+        <div class="arch-grid">
+
+            <div class="arch-card">
+                <div class="arch-card-head">Cultural Foundation</div>
+                <ul class="arch-list">
+                    <li><strong>ISHQ &amp; RISHTEY</strong> — emotional ownership and relationships as the connective tissue of a dispersed operation</li>
+                    <li><strong>I-DEPOSIT Values</strong> — Integrity, Dedication, Empathy, Commitment, Innovation, Trust; reinforced daily, not just stated</li>
+                    <li><strong>Seven Mantras</strong> — a universal code for every employee, from plant operator to CEO: Know Your Goals, Sharpen Your Saw, Own the Business (ISHQ), Develop Your Team</li>
+                    <li><strong>Lucky Dip</strong> — weekly culture quiz, 83 editions; employees look forward to Saturday for the next one</li>
+                    <li><strong>We@RDC</strong> — quarterly e-magazine written by employees, about employees</li>
+                </ul>
+            </div>
+
+            <div class="arch-card">
+                <div class="arch-card-head">DISHA: Annual Alignment</div>
+                <ul class="arch-list">
+                    <li><strong>96% participation</strong> in 2025 across 13 locations India-wide</li>
+                    <li><strong>Full-day programme</strong> — year in review, vision, goal cascading to individual KPIs, recognition, and re-energisation</li>
+                    <li><strong>Bedhadak Bolo</strong> — structured "Speak Fearlessly" session where every voice is heard without fear</li>
+                    <li><strong>Employee-led success stories</strong> — peers share achievements, not corporate videos</li>
+                    <li><strong>Closed feedback loop</strong> — all actions compiled in Google Sheets and shared with every employee</li>
+                </ul>
+            </div>
+
+            <div class="arch-card">
+                <div class="arch-card-head">Learning Ecosystem</div>
+                <ul class="arch-list">
+                    <li><strong>Deeksha LMS</strong> — the only LMS in the Indian RMX industry; 120+ courses, gamification, and Kora Kagaz peer learning (modelled on Quora)</li>
+                    <li><strong>BITS Pilani WILP</strong> — company-sponsored MBA &amp; B.Tech for working employees; 45 currently enrolled</li>
+                    <li><strong>Great Managers Institute</strong> — 100+ plant managers developed as mini-CEOs</li>
+                    <li><strong>RPLDP &amp; RQLDP</strong> — Plant and Quality Leadership Development Programmes forming a structured career pipeline</li>
+                    <li><strong>Kaushal Multi-Skilling</strong> — tri-colour competency assessment at plant level; Kaushal Index 3.6/5 (target: 3.5)</li>
+                </ul>
+            </div>
+
+            <div class="arch-card">
+                <div class="arch-card-head">Talent Pipeline</div>
+                <ul class="arch-list">
+                    <li><strong>Campus-first model</strong> — less than 20% external hiring even as the company scaled from 17 to 140 plants</li>
+                    <li><strong>CUBs</strong> — pool campus drives at Tier-2 &amp; Tier-3 engineering colleges; hunger over pedigree</li>
+                    <li><strong>COLTs</strong> — walk-in continuous hiring throughout the year to refresh the talent pipeline</li>
+                    <li><strong>522+ campus hires</strong> in 2024–25; 400+ in 2023–24</li>
+                    <li><strong>SARTAJ</strong> — 20-parameter monthly plant benchmarking; targets raised every year to drive a culture of continuous improvement</li>
+                </ul>
+            </div>
+
+            <div class="arch-card">
+                <div class="arch-card-head">Recognition &amp; Rewards</div>
+                <ul class="arch-list">
+                    <li><strong>Prerna Awards</strong> — 351 awards in the last year; 35% of all employees recognized monthly for innovation and outstanding contribution</li>
+                    <li><strong>Guru Samman</strong> — honours in-house trainers who develop new joiners; celebrating those who build others</li>
+                    <li><strong>SHISHU Prerna</strong> — monthly scholarships for employees' children; investing in the family, not just the career</li>
+                    <li><strong>Star of the Year</strong> — highest individual honour, celebrated at DISHA in front of peers across the country</li>
+                </ul>
+            </div>
+
+            <div class="arch-card">
+                <div class="arch-card-head">Life Milestones &amp; Inclusion</div>
+                <ul class="arch-list">
+                    <li><strong>Meri Pehli Udaan</strong> — company-sponsored first flight experience for 300+ employees who had never flown</li>
+                    <li><strong>Meri Pehli Videsh Yatra</strong> — first international travel for 55 employees with 5+ years at RDC</li>
+                    <li><strong>Pragati</strong> — structured off-roll to on-roll absorption; 17 employees promoted to permanent payroll last year</li>
+                    <li><strong>Common Uniform</strong> — on-roll and off-roll employees wear the same uniform; inclusion made visible</li>
+                    <li><strong>Off-roll PMS</strong> — structured performance management, fair increments and recognition for all contract employees</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="awards-bar">
+            <span class="award-item">&#127942; Top 50 Mid-Size Workplace India 2025</span>
+            <span class="award-item">&#127942; Best Workplaces for Millennials 2024</span>
+            <span class="award-item">&#127942; Best Managed Companies — Deloitte 2025</span>
+            <span class="award-item">&#127942; Best Brand in Cement &amp; Building Material 2025</span>
+        </div>
+    </div>
+</section>
+
+<!-- AI VISION -->
+<section class="ai-vision" id="ai">
+    <div class="container">
+        <div class="s-label">The Vision</div>
+        <h2 class="s-title">AI That Doesn't Just Assist —<br>It Transforms</h2>
+        <div class="s-rule"></div>
+        <blockquote class="ai-quote">
+            "AI should not just assist — it should run and transform business decisions, experience, and forecasting."
+        </blockquote>
+        <div class="ai-attr">— Dr. K.S. Bhoon</div>
+        <div class="ai-tags">
+            <span class="ai-tag">AI Customer Service</span>
+            <span class="ai-tag">Voice-Based Assessment</span>
+            <span class="ai-tag">Business Simulations</span>
+            <span class="ai-tag">AI-Integrated LMS</span>
+            <span class="ai-tag">Know Yourself Tools</span>
+            <span class="ai-tag">Operational Automation</span>
+            <span class="ai-tag">Predictive Forecasting</span>
+            <span class="ai-tag">Oracle Fusion Migration</span>
+        </div>
+    </div>
+</section>
+
+<!-- TOOLS -->
+<section class="tools" id="tools">
+    <div class="container">
+        <div class="s-label">Learning Platforms</div>
+        <h2 class="s-title" style="font-size:1.9rem;">Tools Built for the Frontline</h2>
+        <div class="s-rule"></div>
+        <p class="s-sub">Three active platforms — each designed around real RMC challenges, deployed on Railway, built from the ground up.</p>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <div class="tool-num">Platform 01</div>
+                <div class="tool-name">RDC Assessments</div>
+                <div class="tool-type">Trainee Evaluation</div>
+                <p class="tool-desc">AI-powered monthly progress evaluation for GETs and DETs, with SARTAJ-based scoring and personalised feedback on operational scenarios.</p>
+                <a href="https://rdc-assessments-production.up.railway.app" target="_blank" rel="noopener" class="tool-link">Open Platform ↗</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-num">Platform 02</div>
+                <div class="tool-name">Business Simulation</div>
+                <div class="tool-type">Strategy Game</div>
+                <p class="tool-desc">Manage a virtual RMC plant. Pricing decisions, cost control, competitive strategy — multiplayer, real-time, and unforgiving.</p>
+                <a href="https://business-simulation-game-v3-production.up.railway.app" target="_blank" rel="noopener" class="tool-link">Open Platform ↗</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-num">Platform 03</div>
+                <div class="tool-name">RDC DISHA Biz Quiz</div>
+                <div class="tool-type">Knowledge Quiz</div>
+                <p class="tool-desc">Timed multiple-choice challenges on RMC operations, quality, and safety — sharp questions drawn from real plant scenarios.</p>
+                <a href="https://web-production-518adb.up.railway.app" target="_blank" rel="noopener" class="tool-link">Open Platform ↗</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">Dr. K.S. Bhoon</div>
+                <div class="footer-tag">People Scientist &nbsp;·&nbsp; Builder &nbsp;·&nbsp; AI Pioneer</div>
+            </div>
+            <div class="footer-links">
+                <a href="https://rdc.in" target="_blank" rel="noopener">RDC Concrete</a>
+                <a href="mailto:ksbhoon@gmail.com">Contact</a>
+            </div>
+            <div class="footer-copy">© 2026 bhoon.org</div>
+        </div>
+    </div>
+</footer>
 
 </body>
 </html>
