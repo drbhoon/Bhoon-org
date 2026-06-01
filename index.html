@@ -385,6 +385,137 @@
         }
         .pq-note { font-size: 1.0rem; color: rgba(255,255,255,0.6); line-height: 1.82; }
 
+        /* ── DEVELOP SECTION ────────────────────── */
+        .develop { background: var(--cream); padding: 96px 0; }
+
+        .dev-opener {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--navy);
+            line-height: 1.55;
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 64px;
+            padding-bottom: 56px;
+            border-bottom: 1px solid var(--border);
+        }
+        .dev-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 56px;
+            margin-bottom: 56px;
+        }
+        .dev-body p { font-size: 1.05rem; color: var(--muted); line-height: 1.88; }
+
+        .dev-transition {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            font-style: italic;
+            color: var(--navy);
+            text-align: center;
+            margin: 0 auto 56px;
+            max-width: 520px;
+        }
+
+        .dev-fire {
+            background: var(--navy);
+            padding: 56px 64px;
+            margin-bottom: 56px;
+        }
+        .dev-fire-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(200,144,42,0.75);
+            margin-bottom: 12px;
+        }
+        .dev-fire-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+        .dev-fire-text {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.72);
+            line-height: 1.88;
+            max-width: 780px;
+        }
+
+        .dev-body2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 56px;
+            margin-bottom: 56px;
+        }
+        .dev-body2 p { font-size: 1.05rem; color: var(--muted); line-height: 1.88; }
+
+        .dev-objective {
+            background: var(--sand);
+            padding: 48px 56px;
+            margin-bottom: 56px;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 56px;
+            align-items: start;
+        }
+        .dev-obj-head {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+        .dev-obj-intro {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 18px;
+        }
+        .dev-obj-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .dev-obj-list li {
+            font-family: 'Source Serif 4', serif;
+            font-size: 0.97rem;
+            color: var(--navy);
+            background: #fff;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gold);
+        }
+
+        .dev-ai {
+            border-left: 3px solid var(--gold);
+            padding-left: 28px;
+            margin-bottom: 56px;
+        }
+        .dev-ai p { font-size: 1.05rem; color: var(--muted); line-height: 1.88; max-width: 820px; }
+
+        .dev-closing {
+            background: var(--navy);
+            padding: 52px 64px;
+        }
+        .dev-closing-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            font-style: italic;
+            color: rgba(255,255,255,0.88);
+            line-height: 1.72;
+            max-width: 860px;
+        }
+
         /* ── EXPLORE TEASERS ─────────────────────── */
         .explore { background: var(--navy); padding: 96px 0; }
         .explore .s-label { color: var(--gold-lt); }
@@ -550,6 +681,13 @@
             .tl-tag { display: inline-block; margin-bottom: 8px; vertical-align: baseline; }
             .tl-desc { font-size: 0.95rem; }
             .people-layout { grid-template-columns: 1fr; gap: 32px; }
+            .dev-body, .dev-body2 { grid-template-columns: 1fr; gap: 28px; }
+            .dev-opener { font-size: 1.5rem; }
+            .dev-fire { padding: 40px 28px; }
+            .dev-fire-title { font-size: 2rem; }
+            .dev-objective { grid-template-columns: 1fr; gap: 20px; padding: 36px 28px; }
+            .dev-closing { padding: 40px 28px; }
+            .dev-closing-text { font-size: 1.2rem; }
             .teaser-grid { grid-template-columns: 1fr; }
             .footer-inner { flex-direction: column; gap: 20px; text-align: center; }
             .footer-links { justify-content: center; }
@@ -693,62 +831,58 @@
     </div>
 </section>
 
-<!-- WHO I DEVELOP -->
-<section class="people" id="develop">
+<!-- DEVELOPING FUTURE LEADERS -->
+<section class="develop" id="develop">
     <div class="container">
-        <div class="people-layout">
+
+        <div class="s-label">Leadership Philosophy</div>
+        <h2 class="s-title">Developing Future Leaders</h2>
+        <div class="s-rule"></div>
+
+        <p class="dev-opener">
+            Many organisations train people.<br>My passion is developing leaders.
+        </p>
+
+        <div class="dev-body">
+            <p>Over the last several decades, I have had the privilege of leading soldiers in the Army, building teams in industry, and mentoring hundreds of professionals across operations, manufacturing, engineering, and business leadership. Through these experiences, I have learned that leadership cannot be developed in classrooms alone. It is forged through challenge, accountability, reflection, and experience.</p>
+            <p>My approach combines structured assessment, targeted development, coaching, mentoring, and real-world exposure. I use modern assessment tools, including Scenario Response Tests (SRTs), behavioural evaluations, competency frameworks, and leadership diagnostics to identify strengths, uncover development needs, and assess leadership potential.</p>
+        </div>
+
+        <p class="dev-transition">Once potential is identified, the real work begins.</p>
+
+        <div class="dev-fire">
+            <div class="dev-fire-label">The Signature Approach</div>
+            <div class="dev-fire-title">Baptism by Fire</div>
+            <p class="dev-fire-text">Rather than protecting young talent from difficult assignments, I expose them to carefully selected challenges that accelerate learning and build confidence. I design development journeys that place individuals in demanding situations where they must make decisions, solve problems, influence people, and deliver results under pressure.</p>
+        </div>
+
+        <div class="dev-body2">
+            <p>For Graduate Engineer Trainees (GETs), Diploma Engineer Trainees (DETs), and emerging managers, this means moving beyond theoretical learning into real business situations where outcomes matter. They learn to deal with customers, vendors, teams, operational crises, quality issues, commercial realities, and leadership dilemmas. They experience responsibility before they receive authority.</p>
+            <p>My role is not merely to teach. It is to guide, challenge, question, support, and help individuals reflect on their experiences so that learning becomes permanent.</p>
+        </div>
+
+        <div class="dev-objective">
+            <div class="dev-obj-head">The<br>Objective</div>
             <div>
-                <div class="s-label">People Science in Action</div>
-                <h2 class="s-title">Who I Develop</h2>
-                <div class="s-rule"></div>
-                <p class="s-sub">Dr. Bhoon believes hungry, hardworking candidates outlast pedigreed ones. He builds tools that stretch people — not sort them.</p>
-                <div class="people-cards">
-                    <div class="pc">
-                        <span class="pc-icon" aria-hidden="true">
-                            <svg viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 4.5l1.6 2.2 2.7-0.5 0.6 2.6 2.5 1.1-0.7 2.6 1.8 2-1.8 2 0.7 2.6-2.5 1.1-0.6 2.6-2.7-0.5L16 27.5l-1.6-2.2-2.7 0.5-0.6-2.6-2.5-1.1 0.7-2.6-1.8-2 1.8-2-0.7-2.6 2.5-1.1 0.6-2.6 2.7 0.5z" stroke="#1B2B4B" stroke-width="1.4"/>
-                                <circle cx="16" cy="16" r="3.6" stroke="#C8902A" stroke-width="1.4"/>
-                            </svg>
-                        </span>
-                        <div>
-                            <div class="pc-title">Plant Operators &amp; Batchers</div>
-                            <p class="pc-text">The frontline engine of RMC. Dr. Bhoon builds competency frameworks, practical assessments, and AI feedback loops tailored to their real-world challenges.</p>
-                        </div>
-                    </div>
-                    <div class="pc">
-                        <span class="pc-icon" aria-hidden="true">
-                            <svg viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 13l13-6 13 6-13 6L3 13z" stroke="#1B2B4B" stroke-width="1.4"/>
-                                <path d="M8 16v5.5c0 1.4 3.6 2.8 8 2.8s8-1.4 8-2.8V16" stroke="#C8902A" stroke-width="1.4"/>
-                                <path d="M28 14v7" stroke="#C8902A" stroke-width="1.4"/>
-                            </svg>
-                        </span>
-                        <div>
-                            <div class="pc-title">GETs &amp; DETs</div>
-                            <p class="pc-text">Graduate and Diploma Engineer Trainees evaluated through SARTAJ — an AI-integrated scoring system delivering sharp, personalised feedback on operational scenarios.</p>
-                        </div>
-                    </div>
-                    <div class="pc">
-                        <span class="pc-icon" aria-hidden="true">
-                            <svg viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 27V19M12 27V13M19 27V8M26 27V16" stroke="#1B2B4B" stroke-width="1.4"/>
-                                <path d="M4 11l7-4 7 3 8-6" stroke="#C8902A" stroke-width="1.4"/>
-                                <path d="M22 4h4v4" stroke="#C8902A" stroke-width="1.4"/>
-                            </svg>
-                        </span>
-                        <div>
-                            <div class="pc-title">Future Leaders</div>
-                            <p class="pc-text">Business simulation games, strategy challenges, and accountability frameworks for those hungry to own their plant's P&amp;L — not just manage it.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="pq-block">
-                <p class="pq-text">"I look for hunger and resilience — not pedigree. Attitude is the only currency that compounds."</p>
-                <div class="pq-attr">— Dr. K.S. Bhoon</div>
-                <p class="pq-note">This belief shapes every assessment tool he builds — from the questions asked to the way feedback is delivered. The system must stretch people, not sort them.</p>
+                <div class="dev-obj-intro">To create leaders who are</div>
+                <ul class="dev-obj-list">
+                    <li>Technically competent</li>
+                    <li>Commercially aware</li>
+                    <li>Operationally disciplined</li>
+                    <li>Customer focused</li>
+                    <li>Capable of leading people through uncertainty and change</li>
+                </ul>
             </div>
         </div>
+
+        <div class="dev-ai">
+            <p>In an era increasingly shaped by Artificial Intelligence, leadership remains a uniquely human capability. My vision is to help young professionals combine the power of AI with judgment, character, courage, and execution excellence — creating leaders who can thrive in a rapidly changing world.</p>
+        </div>
+
+        <div class="dev-closing">
+            <p class="dev-closing-text">The greatest satisfaction in my career has never been the projects completed or the targets achieved. It has been watching people I have mentored grow into successful leaders who go on to achieve far more than they believed possible.</p>
+        </div>
+
     </div>
 </section>
 
