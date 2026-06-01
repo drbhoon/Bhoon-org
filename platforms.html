@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <title>AI Platforms — Dr. K.S. Bhoon</title>
+    <meta name="description" content="Three production AI platforms built by Dr. K.S. Bhoon — RDC Assessments, Business Simulation, and DISHA Biz Quiz. Real tools deployed to RDC's frontline.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy:#1B2B4B; --navy-lt:#243660; --gold:#C8902A; --gold-lt:#E8B04A;
+            --green:#2D7A47; --cream:#FAF9F6; --sand:#F0EBE0;
+            --char:#2C2C2C; --muted:#555; --border:#E0D8CC;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth; background:#FAF9F6 !important; color-scheme:light !important; -webkit-text-size-adjust:100%}
+        body{font-family:'Source Serif 4',Georgia,serif;color:#1A1A1A !important;background:#FAF9F6 !important;line-height:1.7;forced-color-adjust:none}
+        /* Prevent iOS / in-app browser dark-mode adaptation from darkening the cream sections or fading text */
+        @media (prefers-color-scheme: dark) {
+            html, body { background:#FAF9F6 !important; color:#1A1A1A !important; color-scheme:light !important; }
+            .plat, .vision, .cta-band { background-color:#FAF9F6 !important; }
+            .plat.alt { background-color:#F0EBE0 !important; }
+            .vision { background-color:#FFFFFF !important; }
+            .cta-band { background-color:#1B2B4B !important; }
+            .plat-name, .plat-meta-val, .pp-title, .pp-q, .pp-stat-big { color:#1B2B4B !important; }
+            .plat-eyebrow, .plat-meta-lbl { color:#8B6420 !important; }
+            .plat-desc { color:#333 !important; }
+            .pp-frame { background:#FFFFFF !important; }
+            .pp-bar { background:#D8D2C5 !important; }
+            .pp-bar.w1 { background:#C8902A !important; }
+        }
+
+        nav{position:fixed;top:0;left:0;right:0;height:66px;background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:1000;border-bottom:2px solid rgba(200,144,42,0.35)}
+        .nav-brand{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.05rem;font-weight:600;letter-spacing:0.03em;text-decoration:none}
+        .nav-links{display:flex;gap:36px;list-style:none}
+        .nav-links a{font-family:'Montserrat',sans-serif;color:rgba(255,255,255,0.72);text-decoration:none;font-size:0.8rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;transition:color 0.2s}
+        .nav-links a:hover,.nav-links a.active{color:var(--gold)}
+        .nav-apps{font-family:'Montserrat',sans-serif;background:transparent;border:1px solid rgba(200,144,42,0.55);color:var(--gold);padding:8px 20px;font-size:0.7rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:all 0.2s}
+        .nav-apps:hover{background:var(--gold);color:var(--navy)}
+
+        .container{max-width:1160px;margin:0 auto;padding:0 48px;position:relative;z-index:1}
+
+        /* Page hero */
+        .page-hero{background:var(--navy);margin-top:66px;padding:96px 0 80px;border-bottom:3px solid var(--gold);position:relative;overflow:hidden}
+        .page-hero::before{content:'';position:absolute;top:50%;right:-200px;width:500px;height:500px;border:1px solid rgba(200,144,42,0.08);border-radius:50%;transform:translateY(-50%);pointer-events:none}
+        .breadcrumb{font-family:'Montserrat',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:28px}
+        .breadcrumb a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(200,144,42,0.4)}
+        .ph-label{font-family:'Montserrat',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-lt);margin-bottom:14px}
+        .ph-title{font-family:'Playfair Display',serif;font-size:3.4rem;font-weight:700;color:#fff;line-height:1.15;max-width:880px}
+        .ph-rule{width:60px;height:2px;background:var(--gold);margin:28px 0}
+        .ph-lede{font-family:'Playfair Display',serif;font-style:italic;font-size:1.4rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:740px}
+
+        /* Vision band */
+        .vision{background:#fff;padding:60px 0;border-bottom:1px solid var(--border);text-align:center}
+        .vision-q{font-family:'Playfair Display',serif;font-size:1.55rem;font-style:italic;color:var(--navy);line-height:1.55;max-width:820px;margin:0 auto 16px}
+        .vision-q::before{content:'\201C';color:var(--gold);opacity:0.55;font-size:2.2rem;line-height:0;vertical-align:-0.4em;margin-right:6px}
+        .vision-q::after{content:'\201D';color:var(--gold);opacity:0.55;font-size:2.2rem;line-height:0;vertical-align:-0.4em;margin-left:4px}
+        .vision-attr{font-family:'Montserrat',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold)}
+
+        /* Platform sections */
+        .plat{padding:104px 0;border-bottom:1px solid var(--border)}
+        .plat:last-of-type{border-bottom:none}
+        .plat.alt{background:var(--sand)}
+        .plat-row{display:grid;grid-template-columns:1fr 1.1fr;gap:80px;align-items:center}
+        .plat-row.reverse .plat-preview-col{order:2}
+
+        .plat-eyebrow{font-family:'Montserrat',sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+        .plat-name{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;color:var(--navy);line-height:1.15;margin-bottom:14px}
+        .plat-type{font-family:'Montserrat',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:24px}
+        .plat-desc{font-size:1.08rem;color:var(--muted);line-height:1.82;margin-bottom:30px}
+        .plat-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:30px}
+        .plat-meta-item{display:flex;flex-direction:column}
+        .plat-meta-lbl{font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+        .plat-meta-val{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--navy);font-weight:600;line-height:1.4}
+        .plat-meta-val small{display:block;font-family:'Source Serif 4',serif;font-weight:400;font-size:0.92rem;color:var(--muted);margin-top:2px;font-style:italic}
+        .plat-cta{display:inline-block;font-family:'Montserrat',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#fff;background:var(--navy);padding:14px 28px;text-decoration:none;border:1px solid var(--navy);transition:all 0.25s}
+        .plat-cta:hover{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+
+        /* Preview tile (richer than home) */
+        .plat-preview{height:380px;border-radius:4px;position:relative;overflow:hidden;box-shadow:0 20px 50px -10px rgba(27,43,75,0.35)}
+        .plat-preview.p1{background:linear-gradient(135deg,#1B2B4B 0%,#243660 100%)}
+        .plat-preview.p2{background:linear-gradient(135deg,#243660 0%,#1B2B4B 100%)}
+        .plat-preview.p3{background:linear-gradient(160deg,#1B2B4B 0%,#2C3F6B 100%)}
+        .pp-frame{position:absolute;inset:24px;background:#FAF9F6;border-radius:3px;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+        .pp-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--border)}
+        .pp-title{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:600;color:var(--navy)}
+        .pp-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+        .pp-status{font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--green)}
+        .pp-content{display:flex;flex-direction:column;gap:8px;flex:1}
+        .pp-bar{height:8px;border-radius:2px;background:var(--border)}
+        .pp-bar.w1{width:62%;background:var(--gold)}
+        .pp-bar.w2{width:88%}
+        .pp-bar.w3{width:75%}
+        .pp-bar.w4{width:46%}
+        .pp-stat-row{display:flex;align-items:baseline;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);margin-top:auto}
+        .pp-stat-big{font-family:'Playfair Display',serif;font-weight:700;font-size:2rem;color:var(--navy);line-height:1}
+        .pp-stat-lbl{font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted)}
+        .pp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex:1}
+        .pp-cell{background:var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:600;color:var(--muted)}
+        .pp-cell.hi{background:var(--gold);color:#fff}
+        .pp-q{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:600;color:var(--navy);margin-bottom:4px}
+        .pp-q small{display:block;font-family:'Source Serif 4',serif;font-style:italic;font-weight:400;font-size:0.82rem;color:var(--muted);margin-top:3px;line-height:1.5}
+        .pp-opt{display:flex;align-items:center;gap:10px;padding:7px 12px;border:1px solid var(--border);border-radius:3px;font-family:'Source Serif 4',serif;font-size:0.85rem;color:var(--char)}
+        .pp-opt.active{border-color:var(--green);background:rgba(45,122,71,0.06);color:var(--green);font-weight:600}
+        .pp-opt-letter{font-family:'Montserrat',sans-serif;font-size:0.65rem;font-weight:600;color:var(--gold)}
+        .pp-opt.active .pp-opt-letter{color:var(--green)}
+        .pp-timer{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border);margin-top:auto}
+        .pp-timer-val{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold)}
+
+        /* CTA back */
+        .cta-band{background:var(--navy);padding:80px 0;text-align:center;border-top:3px solid var(--gold)}
+        .cta-band-q{font-family:'Playfair Display',serif;font-size:1.6rem;font-style:italic;color:#fff;line-height:1.55;max-width:780px;margin:0 auto 36px}
+        .cta-back{font-family:'Montserrat',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:2px solid var(--gold);padding-bottom:4px}
+        .cta-back:hover{color:var(--gold-lt)}
+
+        footer{background:#111827;padding:44px 0;border-top:3px solid var(--gold)}
+        .footer-inner{display:flex;justify-content:space-between;align-items:center}
+        .footer-brand{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--gold);margin-bottom:4px}
+        .footer-tag{font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.32)}
+        .footer-links{display:flex;gap:28px}
+        .footer-links a{font-family:'Montserrat',sans-serif;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.42);text-decoration:none;transition:color 0.2s}
+        .footer-links a:hover{color:var(--gold)}
+        .footer-copy{font-family:'Montserrat',sans-serif;font-size:0.65rem;color:rgba(255,255,255,0.22)}
+
+        @media (max-width:960px){
+            nav{padding:0 24px}
+            .nav-links{display:none}
+            .container{padding:0 24px}
+            .ph-title{font-size:2.1rem}
+            .ph-lede{font-size:1.15rem}
+            .vision-q{font-size:1.2rem}
+            .plat{padding:64px 0}
+            .plat-row{grid-template-columns:1fr;gap:32px}
+            .plat-row.reverse .plat-preview-col{order:0}
+            .plat-name{font-size:1.9rem}
+            .plat-preview{height:300px}
+            .pp-frame{inset:18px;padding:16px}
+            .plat-meta-grid{grid-template-columns:1fr 1fr;gap:18px}
+            .cta-band-q{font-size:1.25rem}
+            .footer-inner{flex-direction:column;gap:20px;text-align:center}
+            .footer-links{justify-content:center;flex-wrap:wrap}
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-brand">Dr. K.S. Bhoon</a>
+    <ul class="nav-links">
+        <li><a href="index.html">About</a></li>
+        <li><a href="people.html">People</a></li>
+        <li><a href="platforms.html" class="active">Platforms</a></li>
+        <li><a href="index.html#journey">Journey</a></li>
+    </ul>
+    <a href="#p1" class="nav-apps">Apps ↓</a>
+</nav>
+
+<header class="page-hero">
+    <div class="container">
+        <div class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; AI Platforms</div>
+        <div class="ph-label">Built for the Frontline</div>
+        <h1 class="ph-title">AI That Doesn't<br>Just Assist. It Runs.</h1>
+        <div class="ph-rule"></div>
+        <p class="ph-lede">Three production platforms — each designed around a real RMC challenge, deployed to actual users on the plant floor. The infrastructure to scale one-on-one mentorship to 1,500+ people.</p>
+    </div>
+</header>
+
+<div class="vision">
+    <div class="container">
+        <p class="vision-q">AI should not just assist — it should run and transform business decisions, experience, and forecasting.</p>
+        <div class="vision-attr">— Dr. K.S. Bhoon</div>
+    </div>
+</div>
+
+<!-- PLATFORM 01 -->
+<section class="plat" id="p1">
+    <div class="container">
+        <div class="plat-row">
+            <div class="plat-preview-col">
+                <div class="plat-preview p1" aria-hidden="true">
+                    <div class="pp-frame">
+                        <div class="pp-top">
+                            <div class="pp-title">RDC Assessments · Trainee #G-2847</div>
+                            <span class="pp-status"><span class="pp-dot"></span>LIVE</span>
+                        </div>
+                        <div class="pp-content">
+                            <div class="pp-bar w1"></div>
+                            <div class="pp-bar w2"></div>
+                            <div class="pp-bar w3"></div>
+                            <div class="pp-bar w4"></div>
+                            <div class="pp-bar w2"></div>
+                        </div>
+                        <div class="pp-stat-row">
+                            <div>
+                                <div class="pp-stat-big">87</div>
+                                <div class="pp-stat-lbl">SARTAJ Score</div>
+                            </div>
+                            <div style="text-align:right">
+                                <div class="pp-stat-big" style="color:var(--green);font-size:1.4rem;">+12</div>
+                                <div class="pp-stat-lbl">vs. last cycle</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="plat-eyebrow">Platform 01</div>
+                <h2 class="plat-name">RDC Assessments</h2>
+                <div class="plat-type">Trainee Evaluation</div>
+                <p class="plat-desc">AI-powered monthly progress evaluation for Graduate and Diploma Engineer Trainees. Twenty-parameter SARTAJ scoring synthesised into personalised feedback on operational scenarios — the depth a senior mentor would give, delivered to every trainee every month.</p>
+                <div class="plat-meta-grid">
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Users</div>
+                        <div class="plat-meta-val">GETs &amp; DETs<small>200+ trainees</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Cadence</div>
+                        <div class="plat-meta-val">Monthly<small>20-parameter cycle</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Engine</div>
+                        <div class="plat-meta-val">SARTAJ<small>AI-integrated scoring</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Outcome</div>
+                        <div class="plat-meta-val">Sharp feedback<small>at one-mentor depth</small></div>
+                    </div>
+                </div>
+                <a href="https://rdc-assessments-production.up.railway.app" target="_blank" rel="noopener" class="plat-cta">Open Platform ↗</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PLATFORM 02 -->
+<section class="plat alt" id="p2">
+    <div class="container">
+        <div class="plat-row reverse">
+            <div class="plat-preview-col">
+                <div class="plat-preview p2" aria-hidden="true">
+                    <div class="pp-frame">
+                        <div class="pp-top">
+                            <div class="pp-title">Plant Sim · Quarter 3 · Multiplayer</div>
+                            <span class="pp-status"><span class="pp-dot"></span>4 TEAMS</span>
+                        </div>
+                        <div class="pp-grid">
+                            <div class="pp-cell">A</div><div class="pp-cell hi">B</div><div class="pp-cell">C</div>
+                            <div class="pp-cell">D</div><div class="pp-cell">E</div><div class="pp-cell hi">F</div>
+                            <div class="pp-cell hi">G</div><div class="pp-cell">H</div><div class="pp-cell">I</div>
+                        </div>
+                        <div class="pp-stat-row">
+                            <div>
+                                <div class="pp-stat-big">₹2.4Cr</div>
+                                <div class="pp-stat-lbl">Virtual P&amp;L</div>
+                            </div>
+                            <div style="text-align:right">
+                                <div class="pp-stat-big" style="color:var(--gold);font-size:1.4rem;">#1</div>
+                                <div class="pp-stat-lbl">leaderboard</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="plat-eyebrow">Platform 02</div>
+                <h2 class="plat-name">Business Simulation</h2>
+                <div class="plat-type">Strategy Game</div>
+                <p class="plat-desc">Manage a virtual RMC plant. Pricing decisions, cost control, competitive strategy — multiplayer, real-time, and unforgiving. The accountability of running your own P&amp;L without the consequences of breaking the real one. Built for hungry future leaders.</p>
+                <div class="plat-meta-grid">
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Users</div>
+                        <div class="plat-meta-val">Future leaders<small>14 plant teams</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Format</div>
+                        <div class="plat-meta-val">Multiplayer<small>real-time competition</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Levers</div>
+                        <div class="plat-meta-val">Pricing &amp; cost<small>full P&amp;L control</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Outcome</div>
+                        <div class="plat-meta-val">Owners, not<small>just managers</small></div>
+                    </div>
+                </div>
+                <a href="https://business-simulation-game-v3-production.up.railway.app" target="_blank" rel="noopener" class="plat-cta">Open Platform ↗</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PLATFORM 03 -->
+<section class="plat" id="p3">
+    <div class="container">
+        <div class="plat-row">
+            <div class="plat-preview-col">
+                <div class="plat-preview p3" aria-hidden="true">
+                    <div class="pp-frame">
+                        <div class="pp-top">
+                            <div class="pp-title">DISHA Biz Quiz · Round 4</div>
+                            <span class="pp-status"><span class="pp-dot" style="background:var(--gold)"></span>TIMED</span>
+                        </div>
+                        <div class="pp-content" style="gap:8px">
+                            <div class="pp-q">Q. Which factor most affects RMC setting time?<small>Drawn from real plant scenarios.</small></div>
+                            <div class="pp-opt"><span class="pp-opt-letter">A</span> Ambient humidity</div>
+                            <div class="pp-opt active"><span class="pp-opt-letter">B</span> Cement-to-water ratio</div>
+                            <div class="pp-opt"><span class="pp-opt-letter">C</span> Aggregate size</div>
+                        </div>
+                        <div class="pp-timer">
+                            <div class="pp-stat-lbl">Time remaining</div>
+                            <div class="pp-timer-val">00:45</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="plat-eyebrow">Platform 03</div>
+                <h2 class="plat-name">RDC DISHA Biz Quiz</h2>
+                <div class="plat-type">Knowledge Quiz</div>
+                <p class="plat-desc">Timed multiple-choice challenges on RMC operations, quality, and safety. Questions drawn from real plant scenarios — not textbook abstractions. Sharp enough to separate the prepared from the rehearsed, fast enough to be fun.</p>
+                <div class="plat-meta-grid">
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Domain</div>
+                        <div class="plat-meta-val">Operations<small>quality &amp; safety</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Format</div>
+                        <div class="plat-meta-val">Timed MCQ<small>real plant scenarios</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Cadence</div>
+                        <div class="plat-meta-val">DISHA event<small>annual + on-demand</small></div>
+                    </div>
+                    <div class="plat-meta-item">
+                        <div class="plat-meta-lbl">Outcome</div>
+                        <div class="plat-meta-val">Living knowledge<small>not stored knowledge</small></div>
+                    </div>
+                </div>
+                <a href="https://web-production-518adb.up.railway.app" target="_blank" rel="noopener" class="plat-cta">Open Platform ↗</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container">
+        <p class="cta-band-q">"Voice assessments, scenario simulations, SARTAJ scoring — building the infrastructure to develop thousands of frontline workers with the precision and empathy of a one-on-one mentor."</p>
+        <a href="people.html" class="cta-back">See the people architecture this serves →</a>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">Dr. K.S. Bhoon</div>
+                <div class="footer-tag">People Scientist &nbsp;·&nbsp; Builder &nbsp;·&nbsp; AI Pioneer</div>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="people.html">People</a>
+                <a href="https://rdc.in" target="_blank" rel="noopener">RDC Concrete</a>
+                <a href="mailto:ksbhoon@gmail.com">Contact</a>
+            </div>
+            <div class="footer-copy">© 2026 bhoon.org</div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

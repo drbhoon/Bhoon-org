@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <title>People Architecture — Dr. K.S. Bhoon</title>
+    <meta name="description" content="Inside RDC's people architecture — six consecutive GPTW certifications, ISHQ & RISHTEY, DISHA, Deeksha LMS, and the culture that built one of India's best-managed companies.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy:#1B2B4B; --navy-lt:#243660; --gold:#C8902A; --gold-lt:#E8B04A;
+            --green:#2D7A47; --cream:#FAF9F6; --sand:#F0EBE0;
+            --char:#2C2C2C; --muted:#555; --border:#E0D8CC;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth; background:#FAF9F6 !important; color-scheme:light !important; -webkit-text-size-adjust:100%}
+        body{font-family:'Source Serif 4',Georgia,serif;color:#1A1A1A !important;background:#FAF9F6 !important;line-height:1.7;forced-color-adjust:none}
+        /* Prevent iOS / in-app browser dark-mode adaptation from darkening the cream sections or fading text */
+        @media (prefers-color-scheme: dark) {
+            html, body { background:#FAF9F6 !important; color:#1A1A1A !important; color-scheme:light !important; }
+            .pa-section { background-color:#FAF9F6 !important; }
+            .pa-section.alt { background-color:#EDE5D2 !important; }
+            .pa-section.dark { background-color:#1B2B4B !important; }
+            .interlude { background-color:#FAF9F6 !important; }
+            .vision, .gptw-strip { background-color:#FFFFFF !important; }
+            .pa-section:not(.dark) .pa-h,
+            .pa-section:not(.dark) .pa-list strong,
+            .gptw-num, .cta-band-q, .interlude-q { color:#1B2B4B !important; }
+            .pa-section.dark .pa-h, .pa-section.dark .pa-list strong { color:#FFFFFF !important; }
+            .pa-section.dark .pa-intro, .pa-section.dark .pa-list li, .pa-section.dark .pa-list span { color:rgba(255,255,255,0.78) !important; }
+            .pa-section:not(.dark) .pa-eyebrow, .interlude-attr { color:#8B6420 !important; }
+            .pa-section.dark .pa-eyebrow { color:#E8B04A !important; }
+            .pa-section:not(.dark) .pa-intro,
+            .pa-section:not(.dark) .pa-list span,
+            .pa-section:not(.dark) .pa-list li,
+            .gptw-label { color:#333 !important; }
+        }
+
+        /* NAV (shared) */
+        nav{position:fixed;top:0;left:0;right:0;height:66px;background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:1000;border-bottom:2px solid rgba(200,144,42,0.35)}
+        .nav-brand{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.05rem;font-weight:600;letter-spacing:0.03em;text-decoration:none}
+        .nav-links{display:flex;gap:36px;list-style:none}
+        .nav-links a{font-family:'Montserrat',sans-serif;color:rgba(255,255,255,0.72);text-decoration:none;font-size:0.8rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;transition:color 0.2s}
+        .nav-links a:hover,.nav-links a.active{color:var(--gold)}
+        .nav-apps{font-family:'Montserrat',sans-serif;background:transparent;border:1px solid rgba(200,144,42,0.55);color:var(--gold);padding:8px 20px;font-size:0.7rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:all 0.2s}
+        .nav-apps:hover{background:var(--gold);color:var(--navy)}
+
+        /* Page hero (compact) */
+        .page-hero{background:var(--navy);margin-top:66px;padding:96px 0 80px;border-bottom:3px solid var(--gold);position:relative;overflow:hidden}
+        .page-hero::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border:1px solid rgba(200,144,42,0.1);border-radius:50%;pointer-events:none}
+        .page-hero::after{content:'';position:absolute;top:-50px;right:-50px;width:300px;height:300px;border:1px solid rgba(200,144,42,0.08);border-radius:50%;pointer-events:none}
+        .container{max-width:1160px;margin:0 auto;padding:0 48px;position:relative;z-index:1}
+        .breadcrumb{font-family:'Montserrat',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:28px}
+        .breadcrumb a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(200,144,42,0.4)}
+        .breadcrumb a:hover{color:var(--gold-lt)}
+        .ph-label{font-family:'Montserrat',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-lt);margin-bottom:14px}
+        .ph-title{font-family:'Playfair Display',serif;font-size:3.4rem;font-weight:700;color:#fff;line-height:1.15;max-width:880px}
+        .ph-rule{width:60px;height:2px;background:var(--gold);margin:28px 0}
+        .ph-lede{font-family:'Playfair Display',serif;font-style:italic;font-size:1.4rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:740px}
+
+        /* GPTW headline strip */
+        .gptw-strip{background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr)}
+        .gptw-item{padding:36px 20px;text-align:center;border-right:1px solid var(--border)}
+        .gptw-item:last-child{border-right:none}
+        .gptw-num{display:block;font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:8px}
+        .gptw-label{font-family:'Montserrat',sans-serif;font-size:0.66rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;line-height:1.55}
+
+        /* Content sections — three-way rhythm: cream / sand / dark to break monotony */
+        .pa-section{padding:88px 0;position:relative}
+        .pa-section + .pa-section{border-top:1px solid rgba(27,43,75,0.08)}
+        .pa-section.alt{background:#EDE5D2}
+        .pa-section.alt + .pa-section{border-top:none}
+        .pa-section.dark{background:#1B2B4B;border-top:none;color:#fff}
+        .pa-section.dark + .pa-section{border-top:none}
+        .pa-section.dark::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(200,144,42,0.5) 50%,transparent 100%)}
+        .pa-section.dark::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(200,144,42,0.5) 50%,transparent 100%)}
+
+        .pa-row{display:grid;grid-template-columns:280px 1fr;gap:64px;align-items:start;position:relative}
+        .pa-eyebrow{font-family:'Montserrat',sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+        .pa-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold);display:inline-block}
+        .pa-h{font-family:'Playfair Display',serif;font-size:1.95rem;font-weight:700;color:var(--navy);line-height:1.2;margin-bottom:18px}
+        .pa-intro{font-size:1.02rem;color:#444;line-height:1.78}
+        .pa-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:18px 32px}
+        .pa-list li{font-size:0.97rem;color:var(--char);line-height:1.7;padding-left:18px;position:relative}
+        .pa-list li::before{content:'';position:absolute;left:0;top:11px;width:8px;height:1px;background:var(--gold)}
+        .pa-list strong{font-family:'Playfair Display',serif;font-weight:600;color:var(--navy);display:block;font-size:1.04rem;margin-bottom:2px}
+        .pa-list span{color:#555}
+
+        /* Dark variant overrides */
+        .pa-section.dark .pa-h{color:#fff}
+        .pa-section.dark .pa-eyebrow{color:#E8B04A}
+        .pa-section.dark .pa-eyebrow::before{background:#E8B04A}
+        .pa-section.dark .pa-intro{color:rgba(255,255,255,0.78)}
+        .pa-section.dark .pa-list li{color:rgba(255,255,255,0.78)}
+        .pa-section.dark .pa-list strong{color:#fff}
+        .pa-section.dark .pa-list span{color:rgba(255,255,255,0.7)}
+        .pa-section.dark .pa-list li::before{background:#E8B04A}
+
+        /* Interlude — pull-quote band between sections */
+        .interlude{padding:80px 0;background:#FAF9F6;text-align:center;position:relative}
+        .interlude::before{content:'\201C';position:absolute;top:24px;left:50%;transform:translateX(-50%);font-family:'Playfair Display',serif;font-size:4rem;color:var(--gold);opacity:0.35;line-height:1}
+        .interlude-q{font-family:'Playfair Display',serif;font-size:1.55rem;font-style:italic;color:var(--navy);line-height:1.55;max-width:740px;margin:0 auto 18px;padding-top:18px}
+        .interlude-attr{font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold)}
+
+        /* Awards strip */
+        .awards{background:var(--navy);padding:60px 0;text-align:center}
+        .awards-title{font-family:'Montserrat',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-lt);opacity:0.7;margin-bottom:28px}
+        .awards-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 38px}
+        .award{font-family:'Source Serif 4',serif;font-size:1rem;color:rgba(255,255,255,0.85);font-style:italic}
+        .award::before{content:'🏆 ';font-style:normal;margin-right:6px}
+
+        /* CTA back */
+        .cta-band{background:var(--cream);padding:80px 0;text-align:center}
+        .cta-band-q{font-family:'Playfair Display',serif;font-size:1.7rem;font-style:italic;color:var(--navy);line-height:1.5;max-width:760px;margin:0 auto 36px}
+        .cta-back{font-family:'Montserrat',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--navy);text-decoration:none;border-bottom:2px solid var(--gold);padding-bottom:4px}
+        .cta-back:hover{color:var(--gold)}
+
+        /* Footer (shared) */
+        footer{background:#111827;padding:44px 0;border-top:3px solid var(--gold)}
+        .footer-inner{display:flex;justify-content:space-between;align-items:center}
+        .footer-brand{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--gold);margin-bottom:4px}
+        .footer-tag{font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.55)}
+        .footer-links{display:flex;gap:28px}
+        .footer-links a{font-family:'Montserrat',sans-serif;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.72);text-decoration:none;transition:color 0.2s}
+        .footer-links a:hover{color:var(--gold)}
+        .footer-copy{font-family:'Montserrat',sans-serif;font-size:0.65rem;color:rgba(255,255,255,0.5)}
+
+        @media (max-width:960px){
+            nav{padding:0 24px}
+            .nav-links{display:none}
+            .container{padding:0 24px}
+            .ph-title{font-size:2.1rem}
+            .ph-lede{font-size:1.15rem}
+            .gptw-strip{grid-template-columns:repeat(2,1fr)}
+            .gptw-item{padding:24px 12px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+            .gptw-item:nth-child(2n){border-right:none}
+            .pa-section{padding:56px 0}
+            .pa-row{grid-template-columns:1fr;gap:28px}
+            .pa-h{font-size:1.6rem}
+            .pa-list{grid-template-columns:1fr;gap:14px}
+            .interlude{padding:48px 0}
+            .interlude-q{font-size:1.2rem;padding-top:14px}
+            .interlude::before{font-size:3rem;top:16px}
+            .awards-grid{flex-direction:column;gap:12px}
+            .footer-inner{flex-direction:column;gap:20px;text-align:center}
+            .footer-links{justify-content:center;flex-wrap:wrap}
+            .cta-band-q{font-size:1.3rem}
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-brand">Dr. K.S. Bhoon</a>
+    <ul class="nav-links">
+        <li><a href="index.html">About</a></li>
+        <li><a href="people.html" class="active">People</a></li>
+        <li><a href="platforms.html">Platforms</a></li>
+        <li><a href="index.html#journey">Journey</a></li>
+    </ul>
+    <a href="platforms.html" class="nav-apps">Apps ↗</a>
+</nav>
+
+<header class="page-hero">
+    <div class="container">
+        <div class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; People Architecture</div>
+        <div class="ph-label">Inside RDC</div>
+        <h1 class="ph-title">A Great Place to<br>Work. By Design.</h1>
+        <div class="ph-rule"></div>
+        <p class="ph-lede">Six consecutive GPTW certifications. A culture built on ISHQ, RISHTEY, and a people philosophy that runs from campus hiring to off-roll absorption — touching every person, every week.</p>
+    </div>
+</header>
+
+<div class="gptw-strip">
+    <div class="gptw-item"><span class="gptw-num">6</span><span class="gptw-label">Consecutive GPTW<br>Certifications</span></div>
+    <div class="gptw-item"><span class="gptw-num">92%</span><span class="gptw-label">GPTW<br>Score</span></div>
+    <div class="gptw-item"><span class="gptw-num">81</span><span class="gptw-label">Net Promoter<br>Score</span></div>
+    <div class="gptw-item"><span class="gptw-num">5%</span><span class="gptw-label">Mid &amp; Senior<br>Attrition</span></div>
+    <div class="gptw-item"><span class="gptw-num">80%</span><span class="gptw-label">Leaders Promoted<br>Internally</span></div>
+</div>
+
+<section class="pa-section">
+    <div class="container">
+        <div class="pa-row">
+            <div>
+                <div class="pa-eyebrow">01 · Foundation</div>
+                <h2 class="pa-h">Cultural Foundation</h2>
+                <p class="pa-intro">The emotional infrastructure of a dispersed operation. Daily reinforcement, not framed posters.</p>
+            </div>
+            <ul class="pa-list">
+                <li><strong>ISHQ &amp; RISHTEY</strong><span>Emotional ownership and relationships as the connective tissue across 140+ plants.</span></li>
+                <li><strong>I-DEPOSIT Values</strong><span>Integrity, Dedication, Empathy, Commitment, Innovation, Trust — reinforced daily.</span></li>
+                <li><strong>Seven Mantras</strong><span>A universal code from plant operator to CEO: Know Your Goals, Sharpen Your Saw, Own the Business.</span></li>
+                <li><strong>Lucky Dip</strong><span>Weekly culture quiz, 83 editions. Employees look forward to Saturday.</span></li>
+                <li><strong>We@RDC</strong><span>Quarterly e-magazine written by employees, about employees.</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="pa-section alt">
+    <div class="container">
+        <div class="pa-row">
+            <div>
+                <div class="pa-eyebrow">02 · Alignment</div>
+                <h2 class="pa-h">DISHA: Annual Alignment</h2>
+                <p class="pa-intro">One day a year, India-wide, every voice heard. The full programme cascades vision into individual KPIs.</p>
+            </div>
+            <ul class="pa-list">
+                <li><strong>96% participation</strong><span>In 2025 across 13 locations India-wide.</span></li>
+                <li><strong>Full-day programme</strong><span>Year in review, vision, goal cascading, recognition, re-energisation.</span></li>
+                <li><strong>Bedhadak Bolo</strong><span>"Speak Fearlessly" session where every voice is heard without fear of consequence.</span></li>
+                <li><strong>Employee-led success stories</strong><span>Peers share achievements — not corporate videos.</span></li>
+                <li><strong>Closed feedback loop</strong><span>All actions compiled in Google Sheets and shared with every employee.</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="pa-section dark">
+    <div class="container">
+        <div class="pa-row">
+            <div>
+                <div class="pa-eyebrow">03 · Learning</div>
+                <h2 class="pa-h">Learning Ecosystem</h2>
+                <p class="pa-intro">The only LMS in the Indian RMX industry, a Quora-style peer learning platform, and a structured career pipeline from operator to CEO.</p>
+            </div>
+            <ul class="pa-list">
+                <li><strong>Deeksha LMS</strong><span>Only LMS in the Indian RMX industry. 120+ courses, gamification, Kora Kagaz peer learning.</span></li>
+                <li><strong>BITS Pilani WILP</strong><span>Company-sponsored MBA &amp; B.Tech for working employees. 45 currently enrolled.</span></li>
+                <li><strong>Great Managers Institute</strong><span>100+ plant managers developed as mini-CEOs.</span></li>
+                <li><strong>RPLDP &amp; RQLDP</strong><span>Plant and Quality Leadership Development Programmes — a structured career pipeline.</span></li>
+                <li><strong>Kaushal Multi-Skilling</strong><span>Tri-colour competency assessment at plant level. Kaushal Index 3.6/5 (target: 3.5).</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- INTERLUDE -->
+<div class="interlude">
+    <div class="container">
+        <p class="interlude-q">Less than 20% external hiring even as the company scaled from 17 to 140 plants.</p>
+        <div class="interlude-attr">Campus-First, Always</div>
+    </div>
+</div>
+
+<section class="pa-section alt">
+    <div class="container">
+        <div class="pa-row">
+            <div>
+                <div class="pa-eyebrow">04 · Pipeline</div>
+                <h2 class="pa-h">Talent Pipeline</h2>
+                <p class="pa-intro">Campus-first model. Hunger over pedigree. The company scaled 8× without 8×ing external hiring.</p>
+            </div>
+            <ul class="pa-list">
+                <li><strong>Campus-first model</strong><span>Less than 20% external hiring even as the company scaled from 17 to 140 plants.</span></li>
+                <li><strong>CUBs</strong><span>Pool campus drives at Tier-2 &amp; Tier-3 engineering colleges. Hunger over pedigree.</span></li>
+                <li><strong>COLTs</strong><span>Walk-in continuous hiring throughout the year to refresh the talent pipeline.</span></li>
+                <li><strong>522+ campus hires</strong><span>In 2024–25. 400+ in 2023–24.</span></li>
+                <li><strong>SARTAJ</strong><span>20-parameter monthly plant benchmarking. Targets raised every year.</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="pa-section dark">
+    <div class="container">
+        <div class="pa-row">
+            <div>
+                <div class="pa-eyebrow">05 · Recognition</div>
+                <h2 class="pa-h">Recognition &amp; Rewards</h2>
+                <p class="pa-intro">35% of all employees recognised every month. The system celebrates trainers, families, and individual excellence.</p>
+            </div>
+            <ul class="pa-list">
+                <li><strong>Prerna Awards</strong><span>351 awards in the last year. 35% of all employees recognised monthly.</span></li>
+                <li><strong>Guru Samman</strong><span>Honours in-house trainers who develop new joiners.</span></li>
+                <li><strong>SHISHU Prerna</strong><span>Monthly scholarships for employees' children. Investing in the family.</span></li>
+                <li><strong>Star of the Year</strong><span>Highest individual honour, celebrated at DISHA in front of peers across the country.</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="pa-section">
+    <div class="container">
+        <div class="pa-row">
+            <div>
+                <div class="pa-eyebrow">06 · Inclusion</div>
+                <h2 class="pa-h">Life Milestones &amp; Inclusion</h2>
+                <p class="pa-intro">First flights. First international travel. Same uniform for everyone. Inclusion made visible.</p>
+            </div>
+            <ul class="pa-list">
+                <li><strong>Meri Pehli Udaan</strong><span>Company-sponsored first flight experience for 300+ employees who had never flown.</span></li>
+                <li><strong>Meri Pehli Videsh Yatra</strong><span>First international travel for 55 employees with 5+ years at RDC.</span></li>
+                <li><strong>Pragati</strong><span>Structured off-roll to on-roll absorption. 17 employees promoted to permanent payroll last year.</span></li>
+                <li><strong>Common Uniform</strong><span>On-roll and off-roll employees wear the same uniform. Inclusion made visible.</span></li>
+                <li><strong>Off-roll PMS</strong><span>Structured performance management and fair increments for all contract employees.</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="awards">
+    <div class="container">
+        <div class="awards-title">External Recognition</div>
+        <div class="awards-grid">
+            <span class="award">Top 50 Mid-Size Workplace India 2025</span>
+            <span class="award">Best Workplaces for Millennials 2024</span>
+            <span class="award">Best Managed Companies — Deloitte 2025</span>
+            <span class="award">Best Brand in Cement &amp; Building Material 2025</span>
+        </div>
+    </div>
+</div>
+
+<section class="cta-band">
+    <div class="container">
+        <p class="cta-band-q">"The system must stretch people, not sort them. Identify the hungry ones early. Give them the tools, the accountability, and the room to grow."</p>
+        <a href="platforms.html" class="cta-back">See the AI platforms that scale this →</a>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">Dr. K.S. Bhoon</div>
+                <div class="footer-tag">People Scientist &nbsp;·&nbsp; Builder &nbsp;·&nbsp; AI Pioneer</div>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="platforms.html">Platforms</a>
+                <a href="https://rdc.in" target="_blank" rel="noopener">RDC Concrete</a>
+                <a href="mailto:ksbhoon@gmail.com">Contact</a>
+            </div>
+            <div class="footer-copy">© 2026 bhoon.org</div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
