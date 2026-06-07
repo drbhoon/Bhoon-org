@@ -1,12 +1,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL:          '/api',
+  withCredentials:  true,   // send ksb_sso_token cookie on every request
 });
 
+// Attach localStorage JWT as fallback (for sessions created before SSO migration)
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('ksb_user_token');
-  if (token) {
+  if (token && !config.headers['Authorization']) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
   return config;

@@ -1,11 +1,22 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import api from '../api/client.js';
 
+const ERROR_MESSAGES = {
+  oauth_cancelled:       'Google sign-in was cancelled.',
+  not_allowed:           'Your Google account is not on the approved list.',
+  token_exchange_failed: 'Google authentication failed. Please try again.',
+  profile_fetch_failed:  'Could not retrieve your Google profile. Please try again.',
+  server_error:          'A server error occurred. Please try again.',
+};
+
 export default function Login() {
-  const navigate = useNavigate();
-  const [form, setForm]     = useState({ email: '', password: '' });
-  const [error, setError]   = useState('');
+  const navigate        = useNavigate();
+  const [searchParams]  = useSearchParams();
+  const oauthError      = searchParams.get('error');
+
+  const [form, setForm]       = useState({ email: '', password: '' });
+  const [error, setError]     = useState(oauthError ? ERROR_MESSAGES[oauthError] || 'Sign-in failed.' : '');
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
@@ -43,6 +54,31 @@ export default function Login() {
             </div>
           )}
 
+          {/* Google Sign-In */}
+          <a
+            href="/api/auth/google"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              width: '100%', padding: '11px 16px', boxSizing: 'border-box',
+              border: '1.5px solid #d0d9e8', borderRadius: 8,
+              background: '#fff', color: '#333',
+              fontSize: 15, fontWeight: 600, textDecoration: 'none',
+              marginBottom: 20,
+            }}
+          >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              width="20" height="20" alt=""
+            />
+            Continue with Google
+          </a>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <div style={{ flex: 1, height: 1, background: '#e0e8f0' }} />
+            <span style={{ fontSize: 12, color: '#aaa', fontWeight: 600 }}>or sign in with password</span>
+            <div style={{ flex: 1, height: 1, background: '#e0e8f0' }} />
+          </div>
+
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 18 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }}>Email address</label>
@@ -72,14 +108,10 @@ export default function Login() {
               type="submit"
               disabled={loading}
               style={{
-                width: '100%',
-                padding: '12px',
+                width: '100%', padding: '12px',
                 background: loading ? '#8aabcc' : '#1a2e4a',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                fontSize: 15,
-                fontWeight: 700,
+                color: '#fff', border: 'none', borderRadius: 8,
+                fontSize: 15, fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
               }}
             >

@@ -45,6 +45,31 @@ export default function Register() {
             </div>
           )}
 
+          {/* Google Sign-In */}
+          <a
+            href="/api/auth/google"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              width: '100%', padding: '11px 16px', boxSizing: 'border-box',
+              border: '1.5px solid #d0d9e8', borderRadius: 8,
+              background: '#fff', color: '#333',
+              fontSize: 15, fontWeight: 600, textDecoration: 'none',
+              marginBottom: 20,
+            }}
+          >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              width="20" height="20" alt=""
+            />
+            Continue with Google
+          </a>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <div style={{ flex: 1, height: 1, background: '#e0e8f0' }} />
+            <span style={{ fontSize: 12, color: '#aaa', fontWeight: 600 }}>or register with email</span>
+            <div style={{ flex: 1, height: 1, background: '#e0e8f0' }} />
+          </div>
+
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 18 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }}>Full name</label>
