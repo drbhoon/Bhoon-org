@@ -34,10 +34,13 @@ router.get('/list', requireUser, async (req, res) => {
       [userId]
     );
     const status = await getLimitStatus();
+    const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase();
+    const isAdmin = !!adminEmail && (req.user.email || '').toLowerCase() === adminEmail;
     res.json({
       assessments:  rows,
       limitReached: status.limitReached,
       limitMessage: status.limitReached ? LIMIT_MESSAGE(status.limit) : null,
+      isAdmin,
     });
   } catch (err) {
     console.error('List assessments error:', err);
@@ -70,6 +73,22 @@ router.post('/create', requireUser, async (req, res) => {
   } catch (err) {
     console.error('Create assessment error:', err);
     res.status(500).json({ error: 'Failed to create assessment' });
+  }
+});
+
+// DELETE /api/assess/id/:id — delete your own assessment (e.g. an abandoned in-progress one)
+router.delete('/id/:id', requireUser, async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const { rowCount } = await pool.query(
+      `DELETE FROM assessments WHERE id = $1 AND user_id = $2`,
+      [req.params.id, userId]
+    );
+    if (!rowCount) return res.status(404).json({ error: 'Assessment not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete own assessment error:', err);
+    res.status(500).json({ error: 'Failed to delete assessment' });
   }
 });
 

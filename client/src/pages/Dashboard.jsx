@@ -17,6 +17,8 @@ export default function Dashboard() {
   const [creating, setCreating]       = useState(false);
   const [limitReached, setLimitReached] = useState(false);
   const [limitMessage, setLimitMessage] = useState('');
+  const [isAdmin, setIsAdmin]           = useState(false);
+  const [deleting, setDeleting]         = useState(null);
 
   useEffect(() => {
     api.get('/assess/list')
@@ -24,10 +26,24 @@ export default function Dashboard() {
         setAssessments(res.data.assessments || []);
         setLimitReached(!!res.data.limitReached);
         setLimitMessage(res.data.limitMessage || '');
+        setIsAdmin(!!res.data.isAdmin);
       })
       .catch(() => setAssessments([]))
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this assessment? This cannot be undone.')) return;
+    setDeleting(id);
+    try {
+      await api.delete(`/assess/id/${id}`);
+      setAssessments((list) => list.filter((a) => a.id !== id));
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to delete.');
+    } finally {
+      setDeleting(null);
+    }
+  }
 
   async function startNew() {
     setCreating(true);
@@ -57,26 +73,36 @@ export default function Dashboard() {
           </h1>
           <p style={{ margin: 0, color: '#666', fontSize: 15 }}>Your DISC assessment history</p>
         </div>
-        {/* Header CTA only once there's history (and not paused) — empty state has its own button */}
-        {!loading && assessments.length > 0 && !limitReached && (
-          <button
-            onClick={startNew}
-            disabled={creating}
-            style={{
-              background: creating ? '#8aabcc' : '#1a2e4a',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 9,
-              padding: '12px 24px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: creating ? 'not-allowed' : 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {creating ? 'Creating…' : '+ Start New DISC Assessment'}
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {/* Admin panel — visible only to the admin (email === ADMIN_EMAIL), opens with no extra login */}
+          {!loading && isAdmin && (
+            <button
+              onClick={() => navigate('/admin/queue')}
+              style={{
+                background: '#fff', color: '#1a2e4a', border: '1.5px solid #1a2e4a',
+                borderRadius: 9, padding: '12px 20px', fontSize: 14, fontWeight: 700,
+                cursor: 'pointer', whiteSpace: 'nowrap',
+              }}
+            >
+              ⚙ Admin Panel
+            </button>
+          )}
+          {/* Start CTA only once there's history (and not paused) — empty state has its own button */}
+          {!loading && assessments.length > 0 && !limitReached && (
+            <button
+              onClick={startNew}
+              disabled={creating}
+              style={{
+                background: creating ? '#8aabcc' : '#1a2e4a',
+                color: '#fff', border: 'none', borderRadius: 9,
+                padding: '12px 24px', fontSize: 14, fontWeight: 700,
+                cursor: creating ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
+              }}
+            >
+              {creating ? 'Creating…' : '+ Start New DISC Assessment'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Global limit reached — new profiling paused */}
@@ -147,7 +173,7 @@ export default function Dashboard() {
                   </span>
                 </div>
 
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   {a.report_status === 'completed' && (
                     <button
                       onClick={() => navigate(`/report/${a.id}`)}
@@ -167,6 +193,16 @@ export default function Dashboard() {
                       style={{ background: '#f0f3f8', color: '#1a2e4a', border: '1.5px solid #d0d9e8', borderRadius: 8, padding: '10px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
                     >
                       Check Status
+                    </button>
+                  )}
+                  {/* Delete an incomplete / abandoned assessment */}
+                  {a.report_status !== 'completed' && (
+                    <button
+                      onClick={() => handleDelete(a.id)}
+                      disabled={deleting === a.id}
+                      style={{ background: '#fff', color: '#c0392b', border: '1.5px solid #f1c0bb', borderRadius: 8, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: deleting === a.id ? 'not-allowed' : 'pointer' }}
+                    >
+                      {deleting === a.id ? 'Deleting…' : 'Delete'}
                     </button>
                   )}
                 </div>

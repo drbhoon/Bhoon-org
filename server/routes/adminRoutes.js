@@ -1,27 +1,37 @@
 const express = require('express');
+const jwt     = require('jsonwebtoken');
 const pool    = require('../db');
 const { generateAndStoreReport } = require('../aiReport');
 
 const router = express.Router();
 
 function requireAdmin(req, res, next) {
+  const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase();
   const authHeader = req.headers['authorization'] || '';
-  if (!authHeader.startsWith('Basic ')) {
-    return res.status(401).json({ error: 'Admin authentication required' });
-  }
-  const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
-  const idx  = decoded.indexOf(':');
-  const user = decoded.slice(0, idx);
-  const pass = decoded.slice(idx + 1);
 
-  const adminEmail = process.env.ADMIN_EMAIL || '';
-  // Accept either ADMIN_EMAIL or the legacy ADMIN_USERNAME, with ADMIN_PASSWORD.
-  const userOk = (user === process.env.ADMIN_USERNAME && !!process.env.ADMIN_USERNAME)
-    || (!!adminEmail && user.toLowerCase() === adminEmail.toLowerCase());
-  if (!userOk || !process.env.ADMIN_PASSWORD || pass !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Invalid admin credentials' });
+  // (1) Identity-based: the logged-in user whose email === ADMIN_EMAIL.
+  //     Lets the dashboard "Admin" button open the panel with no extra password.
+  const bearer   = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const ssoToken = req.cookies?.ksb_sso_token || bearer;
+  if (ssoToken && adminEmail) {
+    try {
+      const payload = jwt.verify(ssoToken, process.env.JWT_SECRET);
+      if ((payload.email || '').toLowerCase() === adminEmail) return next();
+    } catch { /* fall through to Basic */ }
   }
-  next();
+
+  // (2) Basic auth: ADMIN_EMAIL (or legacy ADMIN_USERNAME) + ADMIN_PASSWORD.
+  if (authHeader.startsWith('Basic ')) {
+    const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
+    const idx  = decoded.indexOf(':');
+    const user = decoded.slice(0, idx);
+    const pass = decoded.slice(idx + 1);
+    const userOk = (!!process.env.ADMIN_USERNAME && user === process.env.ADMIN_USERNAME)
+      || (!!adminEmail && user.toLowerCase() === adminEmail);
+    if (userOk && process.env.ADMIN_PASSWORD && pass === process.env.ADMIN_PASSWORD) return next();
+  }
+
+  return res.status(401).json({ error: 'Admin authentication required' });
 }
 
 // GET /api/admin/queue — list all queued reports

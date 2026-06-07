@@ -17,10 +17,34 @@ export default function AdminQueue() {
   const [toast, setToast]         = useState('');
   const [approving, setApproving] = useState(null);
   const [deleting, setDeleting]   = useState(null);
+  const [ssoMode, setSsoMode]     = useState(false);
 
   function authHeader() {
     return 'Basic ' + btoa(`${creds.username}:${creds.password}`);
   }
+
+  // On mount: if the logged-in user is the admin (email === ADMIN_EMAIL), open the
+  // panel automatically using their session — no separate admin password needed.
+  useEffect(() => {
+    if (!localStorage.getItem('ksb_user_token')) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [q, s, u, i] = await Promise.all([
+          api.get('/admin/queue'), api.get('/admin/stats'),
+          api.get('/admin/users'), api.get('/admin/incomplete'),
+        ]);
+        if (cancelled) return;
+        setQueue(q.data.queue || []);
+        setStats(s.data);
+        setUsers(u.data.users || []);
+        setIncomplete(i.data.incomplete || []);
+        setSsoMode(true);
+        setAuthed(true);
+      } catch { /* not an admin via session — fall back to the password form */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   async function fetchData(header) {
     setLoading(true);
@@ -58,25 +82,29 @@ export default function AdminQueue() {
     }
   }
 
+  // Issue an admin request via the SSO session (api client) or Basic auth, depending on mode.
+  // Throws on failure in both modes so callers' catch blocks handle it.
+  async function adminReq(method, path) {
+    if (ssoMode) {
+      const res = await api({ method, url: path });   // api baseURL = '/api'
+      return res.data;
+    }
+    const res = await fetch(`/api${path}`, { method, headers: { Authorization: authHeader() } });
+    if (!res.ok) throw new Error('request failed');
+    return await res.json().catch(() => ({}));
+  }
+
   async function handleApprove(assessmentId) {
     setApproving(assessmentId);
     try {
-      const res = await fetch(`/api/admin/queue/${assessmentId}/approve`, {
-        method: 'POST',
-        headers: { Authorization: authHeader() },
-      });
-      if (res.ok) {
-        setQueue((q) => q.filter((r) => r.assessment_id !== assessmentId));
-        setToast('Generation triggered — email will be sent on completion.');
-        setTimeout(() => setToast(''), 4000);
-        // Refresh stats
-        const sRes = await fetch('/api/admin/stats', { headers: { Authorization: authHeader() } });
-        if (sRes.ok) setStats(await sRes.json());
-      } else {
-        alert('Approval failed. Please try again.');
-      }
+      await adminReq('post', `/admin/queue/${assessmentId}/approve`);
+      setQueue((q) => q.filter((r) => r.assessment_id !== assessmentId));
+      setToast('Generation triggered — email will be sent on completion.');
+      setTimeout(() => setToast(''), 4000);
+      const s = await adminReq('get', '/admin/stats');
+      if (s) setStats(s);
     } catch {
-      alert('Network error.');
+      alert('Approval failed. Please try again.');
     } finally {
       setApproving(null);
     }
@@ -86,19 +114,12 @@ export default function AdminQueue() {
     if (!window.confirm('Delete this in-progress assessment? This cannot be undone.')) return;
     setDeleting(assessmentId);
     try {
-      const res = await fetch(`/api/admin/assessment/${assessmentId}`, {
-        method: 'DELETE',
-        headers: { Authorization: authHeader() },
-      });
-      if (res.ok) {
-        setIncomplete((list) => list.filter((r) => r.id !== assessmentId));
-        setToast('In-progress assessment deleted.');
-        setTimeout(() => setToast(''), 3500);
-      } else {
-        alert('Delete failed. Please try again.');
-      }
+      await adminReq('delete', `/admin/assessment/${assessmentId}`);
+      setIncomplete((list) => list.filter((r) => r.id !== assessmentId));
+      setToast('In-progress assessment deleted.');
+      setTimeout(() => setToast(''), 3500);
     } catch {
-      alert('Network error.');
+      alert('Delete failed. Please try again.');
     } finally {
       setDeleting(null);
     }
