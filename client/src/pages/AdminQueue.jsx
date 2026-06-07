@@ -9,7 +9,9 @@ export default function AdminQueue() {
   const [authed, setAuthed]   = useState(false);
   const [authErr, setAuthErr] = useState('');
   const [queue, setQueue]     = useState([]);
+  const [users, setUsers]     = useState([]);
   const [stats, setStats]     = useState(null);
+  const [tab, setTab]         = useState('users');
   const [loading, setLoading] = useState(false);
   const [toast, setToast]     = useState('');
   const [approving, setApproving] = useState(null);
@@ -21,15 +23,15 @@ export default function AdminQueue() {
   async function fetchData(header) {
     setLoading(true);
     try {
-      const [qRes, sRes] = await Promise.all([
+      const [qRes, sRes, uRes] = await Promise.all([
         fetch('/api/admin/queue', { headers: { Authorization: header } }),
         fetch('/api/admin/stats', { headers: { Authorization: header } }),
+        fetch('/api/admin/users', { headers: { Authorization: header } }),
       ]);
       if (qRes.status === 401) { setAuthErr('Invalid credentials'); return false; }
-      const qData = await qRes.json();
-      const sData = await sRes.json();
-      setQueue(qData.queue || []);
-      setStats(sData);
+      setQueue((await qRes.json()).queue || []);
+      setStats(await sRes.json());
+      setUsers((await uRes.json()).users || []);
       return true;
     } catch {
       setAuthErr('Failed to connect to server');
@@ -38,6 +40,8 @@ export default function AdminQueue() {
       setLoading(false);
     }
   }
+
+  const fmtDate = (d) => d ? new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -132,19 +136,88 @@ export default function AdminQueue() {
       <div style={{ maxWidth: 900, margin: '28px auto', padding: '0 24px' }}>
         {/* Stats bar */}
         {stats && (
-          <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
-            {[
-              { label: 'Total Users',       value: stats.total_users },
-              { label: 'Completed Reports', value: stats.completed_reports },
-              { label: 'Queued Reports',    value: stats.queued_reports },
-            ].map((s) => (
-              <div key={s.label} style={{ background: '#fff', borderRadius: 10, padding: '16px 24px', border: '1px solid #e0e8f0', flex: 1, minWidth: 150 }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#1a2e4a' }}>{s.value}</div>
-                <div style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>{s.label}</div>
+          <>
+            <div style={{ display: 'flex', gap: 16, marginBottom: stats.limit_reached ? 16 : 24, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Total Users',       value: stats.total_users },
+                { label: `Completed Reports`, value: `${stats.completed_reports} / ${stats.limit ?? 500}`, alert: stats.limit_reached },
+                { label: 'Queued Reports',    value: stats.queued_reports },
+              ].map((s) => (
+                <div key={s.label} style={{ background: '#fff', borderRadius: 10, padding: '16px 24px', border: s.alert ? '1.5px solid #ffb84d' : '1px solid #e0e8f0', flex: 1, minWidth: 150 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: s.alert ? '#b86a00' : '#1a2e4a' }}>{s.value}</div>
+                  <div style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            {stats.limit_reached && (
+              <div style={{ background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 10, padding: '12px 18px', marginBottom: 24, color: '#8a5a00', fontSize: 14, fontWeight: 600 }}>
+                ⏸️ The {stats.limit ?? 500}-profile limit has been reached. New profiling is paused for visitors. To resume, raise <code>AI_REPORT_LIMIT</code> in Railway.
               </div>
-            ))}
+            )}
+          </>
+        )}
+
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          {[['users', `Users (${users.length})`], ['queue', `Report Queue (${queue.length})`]].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              style={{
+                background: tab === key ? '#1a2e4a' : '#fff',
+                color: tab === key ? '#fff' : '#1a2e4a',
+                border: '1px solid #d0d9e8', borderRadius: 8,
+                padding: '9px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Users tab */}
+        {tab === 'users' && (
+          <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e0e8f0', overflow: 'hidden' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e0e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: '#1a2e4a' }}>Who used your service</h2>
+              <span style={{ fontSize: 13, color: '#888' }}>{users.length} registered</span>
+            </div>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>Loading…</div>
+            ) : users.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 48, color: '#888' }}>No users yet.</div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafd', borderBottom: '1px solid #e0e8f0' }}>
+                      <th style={th}>Email</th>
+                      <th style={th}>Name</th>
+                      <th style={th}>Via</th>
+                      <th style={{ ...th, textAlign: 'center' }}>Assessments</th>
+                      <th style={{ ...th, textAlign: 'center' }}>Reports</th>
+                      <th style={th}>Last login</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id} style={{ borderBottom: '1px solid #f0f3f8' }}>
+                        <td style={{ ...td, fontWeight: 600 }}>{u.email}</td>
+                        <td style={{ ...td, color: '#555' }}>{u.full_name || '—'}</td>
+                        <td style={{ ...td, color: '#888', fontSize: 13 }}>{u.auth_method === 'google' ? 'Google' : 'Password'}</td>
+                        <td style={{ ...td, textAlign: 'center' }}>{u.assessments}</td>
+                        <td style={{ ...td, textAlign: 'center' }}>{u.completed_reports}</td>
+                        <td style={{ ...td, color: '#888', fontSize: 13 }}>{fmtDate(u.last_login || u.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
+
+        {tab === 'queue' && (
 
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e0e8f0', overflow: 'hidden' }}>
           <div style={{ padding: '18px 24px', borderBottom: '1px solid #e0e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -202,6 +275,7 @@ export default function AdminQueue() {
             </table>
           )}
         </div>
+        )}
       </div>
     </div>
   );

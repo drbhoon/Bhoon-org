@@ -88,6 +88,27 @@ router.post('/queue/:assessmentId/approve', requireAdmin, async (req, res) => {
   }
 });
 
+// GET /api/admin/users — everyone who has signed in, with their activity
+router.get('/users', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT u.id, u.email, u.full_name, u.created_at, u.last_login,
+              CASE WHEN u.google_id IS NOT NULL THEN 'google' ELSE 'password' END AS auth_method,
+              COUNT(DISTINCT a.id) AS assessments,
+              COUNT(DISTINCT CASE WHEN ar.status = 'completed' THEN ar.id END) AS completed_reports
+       FROM users u
+       LEFT JOIN assessments a ON a.user_id = u.id
+       LEFT JOIN ai_reports ar ON ar.assessment_id = a.id
+       GROUP BY u.id
+       ORDER BY u.last_login DESC NULLS LAST, u.created_at DESC`
+    );
+    res.json({ users: rows });
+  } catch (err) {
+    console.error('Admin users error:', err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 // GET /api/admin/stats
 router.get('/stats', requireAdmin, async (req, res) => {
   try {
@@ -96,10 +117,14 @@ router.get('/stats', requireAdmin, async (req, res) => {
       pool.query(`SELECT COUNT(*) FROM ai_reports WHERE status = 'completed'`),
       pool.query(`SELECT COUNT(*) FROM ai_reports WHERE status = 'queued'`),
     ]);
+    const completedCount = parseInt(completed.rows[0].count, 10);
+    const limit = parseInt(process.env.AI_REPORT_LIMIT || '500', 10);
     res.json({
       total_users:       parseInt(users.rows[0].count, 10),
-      completed_reports: parseInt(completed.rows[0].count, 10),
+      completed_reports: completedCount,
       queued_reports:    parseInt(queued.rows[0].count, 10),
+      limit,
+      limit_reached:     completedCount >= limit,
     });
   } catch (err) {
     console.error('Admin stats error:', err);

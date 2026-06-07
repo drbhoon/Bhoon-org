@@ -7,6 +7,19 @@ const { generateAndStoreReport } = require('../aiReport');
 
 const router = express.Router();
 
+// Returns { completedCount, limit, limitReached } for the global AI-report cap.
+async function getLimitStatus() {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*) FROM ai_reports WHERE status = 'completed'`
+  );
+  const completedCount = parseInt(rows[0].count, 10);
+  const limit = parseInt(process.env.AI_REPORT_LIMIT || '500', 10);
+  return { completedCount, limit, limitReached: completedCount >= limit };
+}
+
+const LIMIT_MESSAGE = (limit) =>
+  `We have reached our target of ${limit} profiles. New profiling is paused for the time being — please check back later. Thank you for your interest!`;
+
 // GET /api/assess/list — list all assessments for the logged-in user
 router.get('/list', requireUser, async (req, res) => {
   const { userId } = req.user;
@@ -20,7 +33,12 @@ router.get('/list', requireUser, async (req, res) => {
        ORDER BY a.created_at DESC`,
       [userId]
     );
-    res.json({ assessments: rows });
+    const status = await getLimitStatus();
+    res.json({
+      assessments:  rows,
+      limitReached: status.limitReached,
+      limitMessage: status.limitReached ? LIMIT_MESSAGE(status.limit) : null,
+    });
   } catch (err) {
     console.error('List assessments error:', err);
     res.status(500).json({ error: 'Failed to list assessments' });
@@ -33,6 +51,15 @@ router.post('/create', requireUser, async (req, res) => {
   const token = crypto.randomBytes(32).toString('hex');
 
   try {
+    // Hard gate: stop new profiling once the global limit is hit.
+    const status = await getLimitStatus();
+    if (status.limitReached) {
+      return res.status(403).json({
+        limitReached: true,
+        error: LIMIT_MESSAGE(status.limit),
+      });
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO assessments (user_id, token, status)
        VALUES ($1, $2, 'pending')

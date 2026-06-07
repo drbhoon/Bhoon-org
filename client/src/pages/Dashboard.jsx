@@ -15,10 +15,16 @@ export default function Dashboard() {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [creating, setCreating]       = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+  const [limitMessage, setLimitMessage] = useState('');
 
   useEffect(() => {
     api.get('/assess/list')
-      .then((res) => setAssessments(res.data.assessments || []))
+      .then((res) => {
+        setAssessments(res.data.assessments || []);
+        setLimitReached(!!res.data.limitReached);
+        setLimitMessage(res.data.limitMessage || '');
+      })
       .catch(() => setAssessments([]))
       .finally(() => setLoading(false));
   }, []);
@@ -29,10 +35,18 @@ export default function Dashboard() {
       const { data } = await api.post('/assess/create');
       navigate(`/assess/${data.token}`);
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to create assessment.');
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+        setLimitReached(true);
+        setLimitMessage(err.response.data.error || '');
+      } else {
+        alert(err.response?.data?.error || 'Failed to create assessment.');
+      }
       setCreating(false);
     }
   }
+
+  const HALT_TEXT = limitMessage ||
+    'We have reached our target of 500 profiles. New profiling is paused for the time being — please check back later.';
 
   return (
     <div style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
@@ -43,8 +57,8 @@ export default function Dashboard() {
           </h1>
           <p style={{ margin: 0, color: '#666', fontSize: 15 }}>Your DISC assessment history</p>
         </div>
-        {/* Header CTA only once there's history — the empty state has its own button */}
-        {!loading && assessments.length > 0 && (
+        {/* Header CTA only once there's history (and not paused) — empty state has its own button */}
+        {!loading && assessments.length > 0 && !limitReached && (
           <button
             onClick={startNew}
             disabled={creating}
@@ -65,20 +79,37 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* Global limit reached — new profiling paused */}
+      {!loading && limitReached && (
+        <div style={{ background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 12, padding: '18px 22px', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+          <div style={{ fontSize: 24, lineHeight: 1 }}>⏸️</div>
+          <div>
+            <div style={{ fontWeight: 800, color: '#8a5a00', fontSize: 15, marginBottom: 4 }}>New profiling is paused</div>
+            <div style={{ color: '#7a5a1a', fontSize: 14, lineHeight: 1.55 }}>{HALT_TEXT}</div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Loading…</div>
       ) : assessments.length === 0 ? (
         <div style={{ background: '#fff', borderRadius: 12, padding: '48px 32px', textAlign: 'center', border: '1.5px dashed #d0d9e8' }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>📋</div>
-          <p style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, color: '#1a2e4a' }}>No assessments yet</p>
-          <p style={{ margin: '0 0 24px', color: '#888', fontSize: 14 }}>Take your first DISC assessment to understand your behavioural style.</p>
-          <button
-            onClick={startNew}
-            disabled={creating}
-            style={{ background: '#1a2e4a', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
-          >
-            Start Assessment
-          </button>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>{limitReached ? '⏸️' : '📋'}</div>
+          <p style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, color: '#1a2e4a' }}>
+            {limitReached ? 'New profiling is paused' : 'No assessments yet'}
+          </p>
+          <p style={{ margin: limitReached ? 0 : '0 0 24px', color: '#888', fontSize: 14, maxWidth: 440, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.55 }}>
+            {limitReached ? HALT_TEXT : 'Take your first DISC assessment to understand your behavioural style.'}
+          </p>
+          {!limitReached && (
+            <button
+              onClick={startNew}
+              disabled={creating}
+              style={{ background: '#1a2e4a', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
+            >
+              {creating ? 'Creating…' : 'Start Assessment'}
+            </button>
+          )}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
