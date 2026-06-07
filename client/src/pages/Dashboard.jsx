@@ -43,23 +43,26 @@ export default function Dashboard() {
           </h1>
           <p style={{ margin: 0, color: '#666', fontSize: 15 }}>Your DISC assessment history</p>
         </div>
-        <button
-          onClick={startNew}
-          disabled={creating}
-          style={{
-            background: creating ? '#8aabcc' : '#1a2e4a',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 9,
-            padding: '12px 24px',
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: creating ? 'not-allowed' : 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {creating ? 'Creating…' : '+ Start New DISC Assessment'}
-        </button>
+        {/* Header CTA only once there's history — the empty state has its own button */}
+        {!loading && assessments.length > 0 && (
+          <button
+            onClick={startNew}
+            disabled={creating}
+            style={{
+              background: creating ? '#8aabcc' : '#1a2e4a',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 9,
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: creating ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {creating ? 'Creating…' : '+ Start New DISC Assessment'}
+          </button>
+        )}
       </div>
 
       {loading ? (
