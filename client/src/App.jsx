@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login          from './pages/Login.jsx';
 import Register       from './pages/Register.jsx';
@@ -9,19 +8,24 @@ import Report         from './pages/Report.jsx';
 import AdminQueue     from './pages/AdminQueue.jsx';
 import Layout         from './components/Layout.jsx';
 
-// Capture ?token= from Google OAuth redirect and store in localStorage
-function useOAuthToken() {
-  useEffect(() => {
+// Capture ?token= from the Google OAuth redirect SYNCHRONOUSLY, at module load —
+// BEFORE any component renders. This must run before RootRedirect/ProtectedRoute
+// read localStorage; otherwise the first render bounces a freshly-authenticated user
+// back to /login (the bug seen on iOS Safari right after picking a Google account).
+(function captureOAuthTokenFromUrl() {
+  try {
     const params = new URLSearchParams(window.location.search);
     const token  = params.get('token');
     if (token) {
       localStorage.setItem('ksb_user_token', token);
-      // Clear the token from the URL without a page reload
+      // Strip the token from the URL without a reload
       const clean = window.location.pathname + window.location.hash;
       window.history.replaceState({}, '', clean);
     }
-  }, []);
-}
+  } catch {
+    /* localStorage blocked (e.g. private mode) — ignore */
+  }
+})();
 
 function ProtectedRoute({ children }) {
   // Protected if either SSO cookie exists (server validates) or localStorage token present
@@ -38,8 +42,6 @@ function RootRedirect() {
 }
 
 export default function App() {
-  useOAuthToken();   // runs once on mount, captures ?token= from Google callback
-
   return (
     <BrowserRouter>
       <Routes>
