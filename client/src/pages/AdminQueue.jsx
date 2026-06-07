@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/client.js';
 
 export default function AdminQueue() {
+  const navigate = useNavigate();
   const [creds, setCreds]   = useState(() => {
     const saved = sessionStorage.getItem('ksb_admin_creds');
     return saved ? JSON.parse(saved) : { username: '', password: '' };
@@ -177,8 +179,14 @@ export default function AdminQueue() {
         </div>
       )}
 
-      <div style={{ background: '#1a2e4a', padding: '0 28px', minHeight: 60, display: 'flex', alignItems: 'center' }}>
+      <div style={{ background: '#1a2e4a', padding: '0 28px', minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <span style={{ color: '#fff', fontWeight: 900, fontSize: 18 }}>KSB Personality Analyser — Admin</span>
+        <button
+          onClick={() => navigate('/dashboard')}
+          style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', borderRadius: 8, padding: '8px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+        >
+          ← Back to Dashboard
+        </button>
       </div>
 
       <div style={{ maxWidth: 900, margin: '28px auto', padding: '0 24px' }}>
