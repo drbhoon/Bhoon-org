@@ -9,9 +9,16 @@ function requireAdmin(req, res, next) {
   if (!authHeader.startsWith('Basic ')) {
     return res.status(401).json({ error: 'Admin authentication required' });
   }
-  const decoded    = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
-  const [user, pass] = decoded.split(':');
-  if (user !== process.env.ADMIN_USERNAME || pass !== process.env.ADMIN_PASSWORD) {
+  const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
+  const idx  = decoded.indexOf(':');
+  const user = decoded.slice(0, idx);
+  const pass = decoded.slice(idx + 1);
+
+  const adminEmail = process.env.ADMIN_EMAIL || '';
+  // Accept either ADMIN_EMAIL or the legacy ADMIN_USERNAME, with ADMIN_PASSWORD.
+  const userOk = (user === process.env.ADMIN_USERNAME && !!process.env.ADMIN_USERNAME)
+    || (!!adminEmail && user.toLowerCase() === adminEmail.toLowerCase());
+  if (!userOk || !process.env.ADMIN_PASSWORD || pass !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: 'Invalid admin credentials' });
   }
   next();
@@ -106,6 +113,36 @@ router.get('/users', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('Admin users error:', err);
     res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// GET /api/admin/incomplete — assessments started but never submitted (no report row)
+router.get('/incomplete', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT a.id, a.token, a.created_at, u.full_name, u.email
+       FROM assessments a
+       JOIN users u ON u.id = a.user_id
+       LEFT JOIN ai_reports ar ON ar.assessment_id = a.id
+       WHERE ar.id IS NULL
+       ORDER BY a.created_at DESC`
+    );
+    res.json({ incomplete: rows });
+  } catch (err) {
+    console.error('Admin incomplete error:', err);
+    res.status(500).json({ error: 'Failed to fetch in-progress assessments' });
+  }
+});
+
+// DELETE /api/admin/assessment/:id — remove an assessment (cascades responses/results/report)
+router.delete('/assessment/:id', requireAdmin, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query(`DELETE FROM assessments WHERE id = $1`, [req.params.id]);
+    if (!rowCount) return res.status(404).json({ error: 'Assessment not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin delete assessment error:', err);
+    res.status(500).json({ error: 'Failed to delete assessment' });
   }
 });
 

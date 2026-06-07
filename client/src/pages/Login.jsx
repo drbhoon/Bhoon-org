@@ -211,6 +211,10 @@ export default function Login() {
                 Don't have an account?{' '}
                 <Link to="/register" style={{ color: '#2563a8', fontWeight: 700, textDecoration: 'none' }}>Create one</Link>
               </p>
+
+              <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 14, borderTop: '1px solid #eef2f7' }}>
+                <Link to="/admin/queue" style={{ color: '#9aa7ba', fontSize: 12.5, fontWeight: 600, textDecoration: 'none' }}>Admin access</Link>
+              </div>
             </div>
 
             <p style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: '#7e93b3' }}>

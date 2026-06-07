@@ -8,13 +8,15 @@ export default function AdminQueue() {
   });
   const [authed, setAuthed]   = useState(false);
   const [authErr, setAuthErr] = useState('');
-  const [queue, setQueue]     = useState([]);
-  const [users, setUsers]     = useState([]);
-  const [stats, setStats]     = useState(null);
-  const [tab, setTab]         = useState('users');
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast]     = useState('');
+  const [queue, setQueue]         = useState([]);
+  const [users, setUsers]         = useState([]);
+  const [incomplete, setIncomplete] = useState([]);
+  const [stats, setStats]         = useState(null);
+  const [tab, setTab]             = useState('users');
+  const [loading, setLoading]     = useState(false);
+  const [toast, setToast]         = useState('');
   const [approving, setApproving] = useState(null);
+  const [deleting, setDeleting]   = useState(null);
 
   function authHeader() {
     return 'Basic ' + btoa(`${creds.username}:${creds.password}`);
@@ -23,15 +25,17 @@ export default function AdminQueue() {
   async function fetchData(header) {
     setLoading(true);
     try {
-      const [qRes, sRes, uRes] = await Promise.all([
+      const [qRes, sRes, uRes, iRes] = await Promise.all([
         fetch('/api/admin/queue', { headers: { Authorization: header } }),
         fetch('/api/admin/stats', { headers: { Authorization: header } }),
         fetch('/api/admin/users', { headers: { Authorization: header } }),
+        fetch('/api/admin/incomplete', { headers: { Authorization: header } }),
       ]);
       if (qRes.status === 401) { setAuthErr('Invalid credentials'); return false; }
       setQueue((await qRes.json()).queue || []);
       setStats(await sRes.json());
       setUsers((await uRes.json()).users || []);
+      setIncomplete((await iRes.json()).incomplete || []);
       return true;
     } catch {
       setAuthErr('Failed to connect to server');
@@ -78,6 +82,28 @@ export default function AdminQueue() {
     }
   }
 
+  async function handleDelete(assessmentId) {
+    if (!window.confirm('Delete this in-progress assessment? This cannot be undone.')) return;
+    setDeleting(assessmentId);
+    try {
+      const res = await fetch(`/api/admin/assessment/${assessmentId}`, {
+        method: 'DELETE',
+        headers: { Authorization: authHeader() },
+      });
+      if (res.ok) {
+        setIncomplete((list) => list.filter((r) => r.id !== assessmentId));
+        setToast('In-progress assessment deleted.');
+        setTimeout(() => setToast(''), 3500);
+      } else {
+        alert('Delete failed. Please try again.');
+      }
+    } catch {
+      alert('Network error.');
+    } finally {
+      setDeleting(null);
+    }
+  }
+
   if (!authed) {
     return (
       <div style={{ minHeight: '100vh', background: '#f0f3f8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Segoe UI', Arial, sans-serif" }}>
@@ -90,12 +116,13 @@ export default function AdminQueue() {
           )}
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }}>Username</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }}>Admin email</label>
               <input
                 type="text"
                 required
                 value={creds.username}
                 onChange={(e) => setCreds({ ...creds, username: e.target.value })}
+                placeholder="set as ADMIN_EMAIL in Railway"
                 style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #d0d9e8', borderRadius: 8, fontSize: 15, outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
@@ -159,7 +186,7 @@ export default function AdminQueue() {
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          {[['users', `Users (${users.length})`], ['queue', `Report Queue (${queue.length})`]].map(([key, label]) => (
+          {[['users', `Users (${users.length})`], ['incomplete', `In Progress (${incomplete.length})`], ['queue', `Report Queue (${queue.length})`]].map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -208,6 +235,60 @@ export default function AdminQueue() {
                         <td style={{ ...td, textAlign: 'center' }}>{u.assessments}</td>
                         <td style={{ ...td, textAlign: 'center' }}>{u.completed_reports}</td>
                         <td style={{ ...td, color: '#888', fontSize: 13 }}>{fmtDate(u.last_login || u.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* In Progress tab — started but never submitted */}
+        {tab === 'incomplete' && (
+          <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e0e8f0', overflow: 'hidden' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e0e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: '#1a2e4a' }}>In progress / not finished</h2>
+              <span style={{ fontSize: 13, color: '#888' }}>{incomplete.length} started</span>
+            </div>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>Loading…</div>
+            ) : incomplete.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 48, color: '#888' }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>✓</div>
+                <div style={{ fontWeight: 700, color: '#1a2e4a', marginBottom: 6 }}>Nothing in progress</div>
+                <div style={{ fontSize: 14 }}>Everyone who started has submitted.</div>
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafd', borderBottom: '1px solid #e0e8f0' }}>
+                      <th style={th}>Email</th>
+                      <th style={th}>Name</th>
+                      <th style={th}>Started</th>
+                      <th style={th}>Status</th>
+                      <th style={{ ...th, textAlign: 'center' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {incomplete.map((r) => (
+                      <tr key={r.id} style={{ borderBottom: '1px solid #f0f3f8' }}>
+                        <td style={{ ...td, fontWeight: 600 }}>{r.email}</td>
+                        <td style={{ ...td, color: '#555' }}>{r.full_name || '—'}</td>
+                        <td style={{ ...td, color: '#888' }}>{fmtDate(r.created_at)}</td>
+                        <td style={td}>
+                          <span style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700, background: '#fff3cd', color: '#856404' }}>Under progress</span>
+                        </td>
+                        <td style={{ ...td, textAlign: 'center' }}>
+                          <button
+                            onClick={() => handleDelete(r.id)}
+                            disabled={deleting === r.id}
+                            style={{ background: deleting === r.id ? '#e0b4b4' : '#c0392b', color: '#fff', border: 'none', borderRadius: 7, padding: '7px 18px', fontSize: 13, fontWeight: 700, cursor: deleting === r.id ? 'not-allowed' : 'pointer' }}
+                          >
+                            {deleting === r.id ? 'Deleting…' : 'Delete'}
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
