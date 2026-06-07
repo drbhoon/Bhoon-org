@@ -4,6 +4,7 @@ const cors         = require('cors');
 const cookieParser = require('cookie-parser');
 const path         = require('path');
 
+const runMigrations = require('./runMigrations');
 const authRoutes   = require('./routes/authRoutes');
 const assessRoutes = require('./routes/assessRoutes');
 const reportRoutes = require('./routes/reportRoutes');
@@ -45,6 +46,13 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`KSB Personality Analyser server running on port ${PORT}`);
-});
+// Apply DB migrations (idempotent) before accepting traffic, then start.
+runMigrations()
+  .catch((err) => {
+    console.error('[migrate] failed:', err.message);
+  })
+  .finally(() => {
+    app.listen(PORT, () => {
+      console.log(`KSB Personality Analyser server running on port ${PORT}`);
+    });
+  });
