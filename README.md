@@ -38,7 +38,7 @@ No production or test database is included. The People service applies its schem
 
 Deploy three services from this repository:
 
-- **gateway** — build with `services/gateway/Dockerfile` using the repository root as build context. Attach `bhoon.org`, `www.bhoon.org`, `people.bhoon.org`, `peoplescience.bhoon.org`, and `stocks.bhoon.org` to this service.
+- **gateway** — deploy from the repository root; the root `Dockerfile` builds the gateway and static site. Attach `bhoon.org`, `www.bhoon.org`, `people.bhoon.org`, `peoplescience.bhoon.org`, and `stocks.bhoon.org` to this service.
 - **people** — use `apps/people` as the service root. Keep it private and set `APP_URL=https://bhoon.org/people` and `GOOGLE_REDIRECT_URI=https://bhoon.org/people/api/auth/google/callback`.
 - **stocks** — use `apps/stocks` as the service root. Keep it private, set `APP_URL=https://bhoon.org/stocks`, and mount a new volume at `/app/data`.
 
