@@ -14,7 +14,7 @@ const isLocalFrontend =
   window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const API_BASE_URL = isLocalFrontend && window.location.port === '5173'
   ? 'http://localhost:8000'
-  : window.location.origin;
+  : `${window.location.origin}/stocks`;
 
 type AppTab = 'PORTFOLIO' | 'SINGLE' | 'MF' | 'PLANNER' | 'ADMIN' | 'LEARN' | 'GAME';
 const APP_TABS: AppTab[] = ['PORTFOLIO', 'SINGLE', 'MF', 'PLANNER', 'ADMIN', 'LEARN', 'GAME'];

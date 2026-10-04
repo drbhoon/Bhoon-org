@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL:          '/api',
+  baseURL:          '/people/api',
   withCredentials:  true,   // send ksb_sso_token cookie on every request
 });
 
@@ -20,7 +20,7 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem('ksb_user_token');
       localStorage.removeItem('ksb_user');
-      window.location.href = '/login';
+      window.location.href = '/people/login';
     }
     return Promise.reject(err);
   }

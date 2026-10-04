@@ -52,10 +52,10 @@ export default function AdminQueue() {
     setLoading(true);
     try {
       const [qRes, sRes, uRes, iRes] = await Promise.all([
-        fetch('/api/admin/queue', { headers: { Authorization: header } }),
-        fetch('/api/admin/stats', { headers: { Authorization: header } }),
-        fetch('/api/admin/users', { headers: { Authorization: header } }),
-        fetch('/api/admin/incomplete', { headers: { Authorization: header } }),
+        fetch('/people/api/admin/queue', { headers: { Authorization: header } }),
+        fetch('/people/api/admin/stats', { headers: { Authorization: header } }),
+        fetch('/people/api/admin/users', { headers: { Authorization: header } }),
+        fetch('/people/api/admin/incomplete', { headers: { Authorization: header } }),
       ]);
       if (qRes.status === 401) { setAuthErr('Invalid credentials'); return false; }
       setQueue((await qRes.json()).queue || []);
@@ -88,10 +88,10 @@ export default function AdminQueue() {
   // Throws on failure in both modes so callers' catch blocks handle it.
   async function adminReq(method, path) {
     if (ssoMode) {
-      const res = await api({ method, url: path });   // api baseURL = '/api'
+      const res = await api({ method, url: path });   // api baseURL = '/people/api'
       return res.data;
     }
-    const res = await fetch(`/api${path}`, { method, headers: { Authorization: authHeader() } });
+    const res = await fetch(`/people/api${path}`, { method, headers: { Authorization: authHeader() } });
     if (!res.ok) throw new Error('request failed');
     return await res.json().catch(() => ({}));
   }

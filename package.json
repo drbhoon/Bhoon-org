@@ -1,0 +1,10 @@
+{
+  "name": "bhoon-org",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/tasks.js build",
+    "start": "node scripts/tasks.js start",
+    "test": "node scripts/tasks.js test"
+  }
+}

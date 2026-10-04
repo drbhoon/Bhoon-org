@@ -1,0 +1,47 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    environment:
+      PORT: 3000
+      PUBLIC_ORIGIN: http://localhost:3000
+      PEOPLE_UPSTREAM: http://people:3001
+      STOCKS_UPSTREAM: http://stocks:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - people
+      - stocks
+
+  people:
+    build: ./apps/people
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      APP_URL: http://localhost:3000/people
+      GOOGLE_REDIRECT_URI: http://localhost:3000/people/api/auth/google/callback
+      DATABASE_URL: ${PEOPLE_DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      ALLOWED_EMAILS: ${ALLOWED_EMAILS:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+
+  stocks:
+    build: ./apps/stocks
+    environment:
+      NODE_ENV: production
+      PORT: 8000
+      APP_URL: http://localhost:3000/stocks
+      DB_DATA_DIR: /app/data
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      ALLOWED_EMAILS: ${ALLOWED_EMAILS:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    volumes:
+      - stocks-data:/app/data
+
+volumes:
+  stocks-data:

@@ -75,6 +75,7 @@ async def health_check():
 # Setup CORS
 _ALLOWED_ORIGINS = [
     "https://stocks.bhoon.org",
+    "https://people.bhoon.org",
     "https://peoplescience.bhoon.org",
     "https://bhoon.org",
     "http://localhost:3000",

@@ -43,7 +43,7 @@ function RootRedirect() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/people">
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login"    element={<Login />} />

@@ -145,7 +145,7 @@ export default function Login() {
 
               {/* Google Sign-In */}
               <a
-                href="/api/auth/google"
+                href="/people/api/auth/google"
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                   width: '100%', padding: '12px 16px', boxSizing: 'border-box',
