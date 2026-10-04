@@ -1,0 +1,36 @@
+# Ignore node modules and local build outputs
+**/node_modules
+**/dist
+**/dist-ssr
+
+# Ignore python caches and virtual environments
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.venv
+**/venv
+**/env
+**/ENV
+# Allow backend/.cache (NSE CSV files) — only block npm/pip/browser caches
+**/.npm
+**/.pip
+**/.pytest_cache
+**/node_modules/.cache
+
+# Ignore git and local environment files
+**/.git
+**/.gitignore
+**/.env*
+
+# Ignore IDE and OS files
+**/.vscode
+**/.idea
+**/.DS_Store
+**/Thumbs.db
+
+# Ignore local run scripts and temporary files
+**/run.bat
+**/*.log
+**/*.sqlite
+**/user_portfolio.xlsx
