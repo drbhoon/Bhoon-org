@@ -43,8 +43,10 @@ app.use((req, res, next) => {
 });
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
-app.get('/people', (_req, res) => res.redirect(308, '/people/'));
-app.get('/stocks', (_req, res) => res.redirect(308, '/stocks/'));
+// Express treats a trailing slash as optional by default. Regex routes keep the
+// canonical "add a slash" redirects from matching /people/ and /stocks/ too.
+app.get(/^\/people$/, (_req, res) => res.redirect(308, '/people/'));
+app.get(/^\/stocks$/, (_req, res) => res.redirect(308, '/stocks/'));
 
 function proxyFor(target, prefix) {
   const upstream = new URL(target);

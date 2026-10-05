@@ -67,6 +67,16 @@ test('normalizes canonical app roots with trailing slashes', async () => {
   stocks.resume();
 });
 
+test('does not redirect canonical roots that already have trailing slashes', async () => {
+  const people = await request('/people/', 'bhoon.org');
+  assert.notEqual(people.statusCode, 308);
+  people.resume();
+
+  const stocks = await request('/stocks/', 'bhoon.org');
+  assert.notEqual(stocks.statusCode, 308);
+  stocks.resume();
+});
+
 test('strips the canonical prefix when proxying to an application', async () => {
   const upstream = http.createServer((req, res) => {
     res.setHeader('content-type', 'application/json');
