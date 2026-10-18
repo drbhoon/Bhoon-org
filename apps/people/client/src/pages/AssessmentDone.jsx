@@ -11,6 +11,9 @@ export default function AssessmentDone() {
   const [assessmentId, setAssessmentId] = useState(location.state?.assessmentId || null);
   const [status, setStatus]             = useState('pending');
   const [resolved, setResolved]         = useState(false);
+  const [retrying, setRetrying]         = useState(false);
+  const [retryError, setRetryError]     = useState('');
+  const [retryNonce, setRetryNonce]     = useState(0);
 
   // If we don't have the assessmentId from state, fetch it via token
   useEffect(() => {
@@ -46,7 +49,23 @@ export default function AssessmentDone() {
 
     poll();
     return () => { stopped = true; };
-  }, [assessmentId]);
+  }, [assessmentId, retryNonce]);
+
+  async function retryGeneration() {
+    if (!assessmentId) return;
+    setRetrying(true);
+    setRetryError('');
+    try {
+      await api.post(`/report/${assessmentId}/retry`);
+      setStatus('pending');
+      setResolved(false);
+      setRetryNonce((value) => value + 1);
+    } catch (err) {
+      setRetryError(err.response?.data?.error || 'Could not restart report generation.');
+    } finally {
+      setRetrying(false);
+    }
+  }
 
   return (
     <div style={{ fontFamily: "'Segoe UI', Arial, sans-serif", textAlign: 'center', padding: '40px 20px' }}>
@@ -102,8 +121,16 @@ export default function AssessmentDone() {
           <div style={{ fontSize: 56, marginBottom: 16 }}>⚠️</div>
           <h2 style={{ color: '#c0392b', fontWeight: 900, fontSize: 22, margin: '0 0 10px' }}>Generation failed</h2>
           <p style={{ color: '#555', fontSize: 15, margin: '0 0 24px' }}>
-            Something went wrong generating your report. Please contact support.
+            Your answers and DISC scores are safely stored. You do not need to retake the assessment.
           </p>
+          {retryError && <p style={{ color: '#c0392b', fontSize: 14 }}>{retryError}</p>}
+          <button
+            onClick={retryGeneration}
+            disabled={retrying || !assessmentId}
+            style={{ background: '#2563a8', color: '#fff', border: 'none', borderRadius: 9, padding: '12px 28px', fontWeight: 700, fontSize: 15, cursor: retrying ? 'not-allowed' : 'pointer', marginRight: 10 }}
+          >
+            {retrying ? 'Restarting…' : 'Try Report Again'}
+          </button>
           <button
             onClick={() => navigate('/dashboard')}
             style={{ background: '#1a2e4a', color: '#fff', border: 'none', borderRadius: 9, padding: '12px 28px', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}

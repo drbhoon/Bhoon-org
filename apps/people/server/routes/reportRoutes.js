@@ -1,6 +1,7 @@
 const express = require('express');
 const pool    = require('../db');
 const { requireUser } = require('../auth');
+const { generateAndStoreReport } = require('../aiReport');
 
 const router = express.Router();
 
@@ -77,6 +78,62 @@ router.get('/:assessmentId/poll', requireUser, async (req, res) => {
   } catch (err) {
     console.error('Poll report error:', err);
     res.status(500).json({ error: 'Failed to poll status' });
+  }
+});
+
+// POST /api/report/:assessmentId/retry — regenerate a failed report from the
+// already-stored answers and computed scores. The assessment is never retaken.
+router.post('/:assessmentId/retry', requireUser, async (req, res) => {
+  const { userId }       = req.user;
+  const { assessmentId } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT ar.status AS report_status,
+              r.g1_d, r.g1_i, r.g1_s, r.g1_c,
+              r.g2_d, r.g2_i, r.g2_s, r.g2_c,
+              r.g3_d, r.g3_i, r.g3_s, r.g3_c,
+              r.primary_style, r.secondary_style,
+              u.full_name, u.email
+       FROM assessments a
+       JOIN users u ON u.id = a.user_id
+       JOIN results r ON r.assessment_id = a.id
+       JOIN ai_reports ar ON ar.assessment_id = a.id
+       WHERE a.id = $1 AND a.user_id = $2`,
+      [assessmentId, userId]
+    );
+
+    if (!rows.length) return res.status(404).json({ error: 'Stored assessment results not found' });
+    if (rows[0].report_status === 'completed') {
+      return res.json({ status: 'completed' });
+    }
+    if (rows[0].report_status === 'pending') {
+      return res.status(409).json({ error: 'Report generation is already in progress' });
+    }
+
+    const row = rows[0];
+    const scores = {
+      g1: { D: row.g1_d, I: row.g1_i, S: row.g1_s, C: row.g1_c },
+      g2: { D: row.g2_d, I: row.g2_i, S: row.g2_s, C: row.g2_c },
+      g3: { D: row.g3_d, I: row.g3_i, S: row.g3_s, C: row.g3_c },
+      primary_style:   row.primary_style,
+      secondary_style: row.secondary_style,
+    };
+
+    await pool.query(
+      `UPDATE ai_reports SET status = 'pending' WHERE assessment_id = $1`,
+      [assessmentId]
+    );
+
+    generateAndStoreReport(assessmentId, scores, {
+      full_name: row.full_name,
+      email:     row.email,
+    });
+
+    res.status(202).json({ status: 'pending' });
+  } catch (err) {
+    console.error('Retry report error:', err);
+    res.status(500).json({ error: 'Failed to retry report generation' });
   }
 });
 

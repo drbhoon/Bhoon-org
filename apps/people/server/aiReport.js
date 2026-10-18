@@ -3,6 +3,7 @@ const pool      = require('./db');
 const { sendReportReadyEmail } = require('./mailer');
 
 const client = new Anthropic();
+const MODEL  = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5';
 
 const SYSTEM_PROMPT = `You are a developmental psychologist and career counsellor specialising in helping engineering graduates in India understand their behavioural style and make better career decisions. You have been given a candidate's DISC profile from a forced-choice behavioural instrument with three graphs. Your job is to generate a comprehensive, honest, and personally useful report written directly to the individual ("You are...", "You tend to..."). This is not an HR selection tool — it is a self-discovery report. Be warm but honest. Name blind spots directly. Career guidance should be broad — covering any engineering, management, consulting, R&D, or entrepreneurial path — not limited to any single company or sector. Return ONLY valid JSON.`;
 
@@ -52,7 +53,7 @@ Return ONLY this JSON structure (no markdown, no explanation, just the JSON obje
 
   try {
     const message = await client.messages.create({
-      model:      'claude-sonnet-4-20250514',
+      model:      MODEL,
       max_tokens: 4000,
       system:     SYSTEM_PROMPT,
       messages:   [{ role: 'user', content: userPrompt }],
@@ -93,8 +94,8 @@ Return ONLY this JSON structure (no markdown, no explanation, just the JSON obje
   } catch (err) {
     console.error('AI report generation failed:', err.message);
     await pool.query(
-      `UPDATE ai_reports SET status = 'failed' WHERE assessment_id = $1`,
-      [assessmentId]
+      `UPDATE ai_reports SET status = 'failed', model_used = $1 WHERE assessment_id = $2`,
+      [MODEL, assessmentId]
     );
   }
 }
