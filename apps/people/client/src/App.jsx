@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login          from './pages/Login.jsx';
 import Dashboard      from './pages/Dashboard.jsx';
@@ -6,6 +7,7 @@ import AssessmentDone from './pages/AssessmentDone.jsx';
 import Report         from './pages/Report.jsx';
 import AdminQueue     from './pages/AdminQueue.jsx';
 import Layout         from './components/Layout.jsx';
+import api            from './api/client.js';
 
 // Capture ?token= from the Google OAuth redirect SYNCHRONOUSLY, at module load —
 // BEFORE any component renders. This must run before RootRedirect/ProtectedRoute
@@ -17,24 +19,6 @@ import Layout         from './components/Layout.jsx';
     const token  = params.get('token');
     if (token) {
       localStorage.setItem('ksb_user_token', token);
-
-      // The dashboard and header read the signed-in user's display details from
-      // localStorage. Google OAuth already puts those claims in the signed JWT,
-      // so hydrate the profile here before the first React render.
-      const payload = JSON.parse(
-        decodeURIComponent(
-          atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
-            .split('')
-            .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
-            .join('')
-        )
-      );
-      localStorage.setItem('ksb_user', JSON.stringify({
-        email:     payload.email,
-        full_name: payload.name,
-        picture:   payload.picture || null,
-      }));
-
       // Strip the token from the URL without a reload
       const clean = window.location.pathname + window.location.hash;
       window.history.replaceState({}, '', clean);
@@ -44,18 +28,48 @@ import Layout         from './components/Layout.jsx';
   }
 })();
 
+function useAuthenticatedSession() {
+  const [status, setStatus] = useState('checking');
+
+  useEffect(() => {
+    let active = true;
+    api.get('/auth/me', { skipAuthRedirect: true })
+      .then(({ data }) => {
+        if (!active) return;
+        localStorage.setItem('ksb_user', JSON.stringify(data.user));
+        setStatus('authenticated');
+      })
+      .catch(() => {
+        if (!active) return;
+        localStorage.removeItem('ksb_user_token');
+        localStorage.removeItem('ksb_user');
+        setStatus('anonymous');
+      });
+
+    return () => { active = false; };
+  }, []);
+
+  return status;
+}
+
+function SessionLoading() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#f0f3f8', color: '#1a2e4a', fontFamily: "'Segoe UI', Arial, sans-serif" }}>
+      Checking your session…
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }) {
-  // Protected if either SSO cookie exists (server validates) or localStorage token present
-  const token = localStorage.getItem('ksb_user_token');
-  // We can't read the HttpOnly cookie in JS, but the server will accept it.
-  // Use localStorage token as the client-side gate; if absent the server's 401 will redirect.
-  if (!token) return <Navigate to="/login" replace />;
-  return children;
+  const status = useAuthenticatedSession();
+  if (status === 'checking') return <SessionLoading />;
+  return status === 'authenticated' ? children : <Navigate to="/login" replace />;
 }
 
 function RootRedirect() {
-  const token = localStorage.getItem('ksb_user_token');
-  return <Navigate to={token ? '/dashboard' : '/login'} replace />;
+  const status = useAuthenticatedSession();
+  if (status === 'checking') return <SessionLoading />;
+  return <Navigate to={status === 'authenticated' ? '/dashboard' : '/login'} replace />;
 }
 
 export default function App() {

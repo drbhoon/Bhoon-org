@@ -1,4 +1,6 @@
-import { Link, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../api/client.js';
 
 const ERROR_MESSAGES = {
   oauth_cancelled:       'Google sign-in was cancelled.',
@@ -34,9 +36,25 @@ const DISCOVER = [
 ];
 
 export default function Login() {
+  const navigate        = useNavigate();
   const [searchParams]  = useSearchParams();
   const oauthError      = searchParams.get('error');
   const error = oauthError ? ERROR_MESSAGES[oauthError] || 'Sign-in failed.' : '';
+
+  // A Google OAuth session is held in a secure HttpOnly cookie. If that cookie
+  // is valid, do not strand the user on the login page just because a browser
+  // localStorage token is missing or was cleared.
+  useEffect(() => {
+    let active = true;
+    api.get('/auth/me', { skipAuthRedirect: true })
+      .then(({ data }) => {
+        if (!active) return;
+        localStorage.setItem('ksb_user', JSON.stringify(data.user));
+        navigate('/dashboard', { replace: true });
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [navigate]);
 
   return (
     <div style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
