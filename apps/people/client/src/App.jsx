@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login          from './pages/Login.jsx';
-import Register       from './pages/Register.jsx';
 import Dashboard      from './pages/Dashboard.jsx';
 import Assessment     from './pages/Assessment.jsx';
 import AssessmentDone from './pages/AssessmentDone.jsx';
@@ -18,6 +17,24 @@ import Layout         from './components/Layout.jsx';
     const token  = params.get('token');
     if (token) {
       localStorage.setItem('ksb_user_token', token);
+
+      // The dashboard and header read the signed-in user's display details from
+      // localStorage. Google OAuth already puts those claims in the signed JWT,
+      // so hydrate the profile here before the first React render.
+      const payload = JSON.parse(
+        decodeURIComponent(
+          atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+            .split('')
+            .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
+            .join('')
+        )
+      );
+      localStorage.setItem('ksb_user', JSON.stringify({
+        email:     payload.email,
+        full_name: payload.name,
+        picture:   payload.picture || null,
+      }));
+
       // Strip the token from the URL without a reload
       const clean = window.location.pathname + window.location.hash;
       window.history.replaceState({}, '', clean);
@@ -47,7 +64,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login"    element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Registration is automatic on first Google sign-in. */}
+        <Route path="/register" element={<Navigate to="/login" replace />} />
 
         <Route path="/dashboard" element={
           <ProtectedRoute>

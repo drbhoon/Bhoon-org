@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import api from '../api/client.js';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const ERROR_MESSAGES = {
   oauth_cancelled:       'Google sign-in was cancelled.',
@@ -36,29 +34,9 @@ const DISCOVER = [
 ];
 
 export default function Login() {
-  const navigate        = useNavigate();
   const [searchParams]  = useSearchParams();
   const oauthError      = searchParams.get('error');
-
-  const [form, setForm]       = useState({ email: '', password: '' });
-  const [error, setError]     = useState(oauthError ? ERROR_MESSAGES[oauthError] || 'Sign-in failed.' : '');
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const { data } = await api.post('/auth/login', form);
-      localStorage.setItem('ksb_user_token', data.token);
-      localStorage.setItem('ksb_user', JSON.stringify(data.user));
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const error = oauthError ? ERROR_MESSAGES[oauthError] || 'Sign-in failed.' : '';
 
   return (
     <div style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
@@ -135,7 +113,9 @@ export default function Login() {
           <div className="ks-auth">
             <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 18px 50px rgba(0,0,0,0.35)' }}>
               <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 900, color: '#1a2e4a', textAlign: 'center' }}>Begin your profile</h2>
-              <p style={{ margin: '0 0 24px', fontSize: 13.5, color: '#7a8aa0', textAlign: 'center' }}>Sign in to take the assessment</p>
+              <p style={{ margin: '0 0 24px', fontSize: 13.5, color: '#7a8aa0', textAlign: 'center' }}>
+                Use your Google account to continue
+              </p>
 
               {error && (
                 <div style={{ background: '#fef0f0', border: '1px solid #f5c6cb', borderRadius: 8, padding: '12px 16px', marginBottom: 20, color: '#c0392b', fontSize: 14 }}>
@@ -161,55 +141,8 @@ export default function Login() {
                 <span style={{ color: '#5ad19a' }}>🔒</span> Secured by Google OAuth 2.0 · No passwords stored
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '22px 0' }}>
-                <div style={{ flex: 1, height: 1, background: '#e0e8f0' }} />
-                <span style={{ fontSize: 12, color: '#aaa', fontWeight: 600 }}>or sign in with email</span>
-                <div style={{ flex: 1, height: 1, background: '#e0e8f0' }} />
-              </div>
-
-              <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }}>Email address</label>
-                  <input
-                    type="email"
-                    required
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #d0d9e8', borderRadius: 8, fontSize: 15, outline: 'none', boxSizing: 'border-box' }}
-                    placeholder="you@example.com"
-                  />
-                </div>
-
-                <div style={{ marginBottom: 22 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }}>Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #d0d9e8', borderRadius: 8, fontSize: 15, outline: 'none', boxSizing: 'border-box' }}
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: '100%', padding: '12px',
-                    background: loading ? '#8aabcc' : '#1a2e4a',
-                    color: '#fff', border: 'none', borderRadius: 8,
-                    fontSize: 15, fontWeight: 700,
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {loading ? 'Signing in…' : 'Sign In'}
-                </button>
-              </form>
-
-              <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: '#666' }}>
-                Don't have an account?{' '}
-                <Link to="/register" style={{ color: '#2563a8', fontWeight: 700, textDecoration: 'none' }}>Create one</Link>
+              <p style={{ textAlign: 'center', margin: '20px 0 0', fontSize: 13, color: '#7a8aa0', lineHeight: 1.5 }}>
+                No registration is required. Your profile is created automatically the first time you continue with Google.
               </p>
 
               <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 14, borderTop: '1px solid #eef2f7' }}>

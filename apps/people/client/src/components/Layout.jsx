@@ -1,11 +1,17 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../api/client.js';
 
 export default function Layout({ children }) {
   const navigate  = useNavigate();
   const location  = useLocation();
   const user      = JSON.parse(localStorage.getItem('ksb_user') || '{}');
 
-  function logout() {
+  async function logout() {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Clear the browser session even if the server is temporarily unavailable.
+    }
     localStorage.removeItem('ksb_user_token');
     localStorage.removeItem('ksb_user');
     navigate('/login');
