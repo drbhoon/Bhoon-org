@@ -154,7 +154,18 @@ function App() {
       const nav = navTabsRef.current;
       const activeTab = nav?.querySelector<HTMLButtonElement>('[data-active-tab="true"]');
       if (nav && activeTab) {
-        nav.scrollLeft = activeTab.offsetLeft - (nav.clientWidth - activeTab.clientWidth) / 2;
+        // Preserve the current position when the selected tab is already
+        // visible. Centring every selection clipped Portfolio at the left edge.
+        const visibleLeft  = nav.scrollLeft;
+        const visibleRight = visibleLeft + nav.clientWidth;
+        const tabLeft      = activeTab.offsetLeft;
+        const tabRight     = tabLeft + activeTab.offsetWidth;
+
+        if (tabLeft < visibleLeft) {
+          nav.scrollTo({ left: Math.max(0, tabLeft - 4), behavior: 'smooth' });
+        } else if (tabRight > visibleRight) {
+          nav.scrollTo({ left: tabRight - nav.clientWidth + 4, behavior: 'smooth' });
+        }
       }
     }, 0);
   }, [currentTab, authChecking, userProfile]);
