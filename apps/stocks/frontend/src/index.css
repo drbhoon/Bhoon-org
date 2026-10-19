@@ -437,6 +437,30 @@ h1, h2, h3, h4, h5 {
   }
 }
 
+/* Signed-in headers include the user profile and sign-out controls. On laptop
+   widths, give the tab strip its own row so neither edge is hidden. */
+@media (min-width: 869px) and (max-width: 1600px) {
+  .app-header {
+    flex-wrap: wrap;
+  }
+
+  .app-brand {
+    order: 1;
+  }
+
+  .app-header-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .nav-tabs-container {
+    order: 3;
+    flex: 1 0 100%;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 868px) {
   .app-header {
     flex-direction: column;
