@@ -43,6 +43,26 @@ app.use((req, res, next) => {
 });
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+
+app.get('/.well-known/assetlinks.json', (_req, res) => {
+  const fingerprints = [
+    '92:29:01:1A:91:C5:36:7A:E0:8E:B6:D5:16:BE:5E:3A:AB:A4:6A:3A:5B:3C:FC:61:27:DF:66:78:D9:1F:2C:52',
+  ];
+  const extra = (process.env.ANDROID_PLAY_SHA256 || '').trim();
+  if (extra && !fingerprints.includes(extra)) {
+    fingerprints.push(extra);
+  }
+  res.json([
+    {
+      relation: ['delegate_permission/common.handle_all_urls'],
+      target: {
+        namespace: 'android_app',
+        package_name: 'org.bhoon.stocks',
+        sha256_cert_fingerprints: fingerprints,
+      },
+    },
+  ]);
+});
 // Express treats a trailing slash as optional by default. Regex routes keep the
 // canonical "add a slash" redirects from matching /people/ and /stocks/ too.
 app.get(/^\/people$/, (_req, res) => res.redirect(308, '/people/'));
