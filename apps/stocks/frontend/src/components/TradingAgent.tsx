@@ -81,6 +81,19 @@ const TEAM_GROUPS = [
 
 const QUICK_TICKERS = ['ICICIBANK.NS', 'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'SBIN.NS', 'NVDA', 'AAPL'];
 
+const CORE_REPORT_TABS = [
+  { id: 'final_trade_decision', label: 'Portfolio Manager Decision' },
+  { id: 'trader_investment_plan', label: 'Trader Plan' },
+  { id: 'investment_plan', label: 'Bull vs. Bear Debate' },
+];
+
+const ANALYST_REPORT_TABS = [
+  { id: 'market_report', label: 'Market / Technical', analyst: 'market' },
+  { id: 'fundamentals_report', label: 'Fundamentals', analyst: 'fundamentals' },
+  { id: 'news_report', label: 'Macro & News', analyst: 'news' },
+  { id: 'sentiment_report', label: 'Social Sentiment', analyst: 'social' },
+];
+
 const STAGE_TILES = [
   {
     pill: 'STAGE 1',
@@ -308,24 +321,46 @@ function SimpleMarkdown({ text, notDeployed = false }: { text: string; notDeploy
           );
         }
         if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-          if (trimmed.replace(/[|\-\s:]/g, '') === '') return null;
-          const cells = trimmed.split('|').slice(1, -1).map(c => c.trim());
+          const previousLine = lines[idx - 1]?.trim() || '';
+          if (previousLine.startsWith('|') && previousLine.endsWith('|')) return null;
+
+          const tableRows: string[][] = [];
+          for (let rowIndex = idx; rowIndex < lines.length; rowIndex += 1) {
+            const row = lines[rowIndex].trim();
+            if (!row.startsWith('|') || !row.endsWith('|')) break;
+            if (row.replace(/[|\-\s:]/g, '') === '') continue;
+            tableRows.push(row.split('|').slice(1, -1).map(cell => cell.trim()));
+          }
+          const columnCount = Math.max(...tableRows.map(row => row.length));
+          if (!tableRows.length || !columnCount) return null;
           return (
-            <div key={idx} style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div key={idx} className="trading-agent-table-scroll">
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${cells.length}, minmax(95px, 1fr))`,
-                  gap: '8px',
-                  padding: '6px 10px',
-                  background: 'rgba(15, 23, 42, 0.55)',
-                  borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  fontSize: '0.82rem',
-                  minWidth: `${cells.length * 95}px`,
+                  minWidth: `${columnCount * 120}px`,
                 }}
               >
-                {cells.map((c, ci) => (
-                  <div key={ci} dangerouslySetInnerHTML={{ __html: formatInline(c) }} />
+                {tableRows.map((cells, rowIndex) => (
+                  <div
+                    key={rowIndex}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: `repeat(${columnCount}, minmax(120px, 1fr))`,
+                      gap: '8px',
+                      padding: '6px 10px',
+                      background: rowIndex === 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(15, 23, 42, 0.55)',
+                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                      fontSize: '0.82rem',
+                      fontWeight: rowIndex === 0 ? 700 : 400,
+                    }}
+                  >
+                    {Array.from({ length: columnCount }, (_, cellIndex) => (
+                      <div
+                        key={cellIndex}
+                        dangerouslySetInnerHTML={{ __html: formatInline(cells[cellIndex] || '') }}
+                      />
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
@@ -349,7 +384,7 @@ function formatInline(str: string): string {
     .replace(/`([^`]+)`/g, '<code style="background:rgba(59,130,246,0.15);color:#93c5fd;padding:1px 5px;border-radius:4px;font-size:0.84em">$1</code>');
 }
 
-export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
+export const TradingAgent: React.FC<Props> = ({ API_BASE_URL, token }) => {
   
   
   const TRADING_AGENT_URL = window.location.origin.includes('localhost:5173') ? 'http://localhost:8001' : API_BASE_URL;
@@ -381,12 +416,19 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
   const [activeReportTab, setActiveReportTab] = useState<string>('final_trade_decision');
   const [historyRuns, setHistoryRuns] = useState<SavedRun[]>([]);
   const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [pipelineOpen, setPipelineOpen] = useState<boolean>(() => window.innerWidth > 960);
+  const [telemetryOpen, setTelemetryOpen] = useState<boolean>(() => window.innerWidth > 960);
   const [searchResults, setSearchResults] = useState<{ symbol: string; name: string; exchange: string; is_etf?: boolean }[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
   const [selectedCompanyName, setSelectedCompanyName] = useState<string>('ICICI Bank Limited');
 
   const logEndRef = useRef<HTMLDivElement>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
+  const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+  const reportTabs = [
+    ...CORE_REPORT_TABS,
+    ...ANALYST_REPORT_TABS.filter(tab => selectedAnalysts.includes(tab.analyst)),
+  ];
 
   const checkServerStatus = async () => {
     try {
@@ -407,7 +449,9 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`${TRADING_AGENT_URL}/api/trading-agent/history`);
+      const res = await fetch(`${TRADING_AGENT_URL}/api/trading-agent/history`, {
+        headers: authHeaders,
+      });
       if (res.ok) {
         const data = await res.json();
         setHistoryRuns(data.runs || []);
@@ -420,7 +464,7 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
     fetchHistory();
     const interval = setInterval(checkServerStatus, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -459,6 +503,10 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
   };
 
   const toggleAnalyst = (key: string) => {
+    const reportId = ANALYST_REPORT_TABS.find(tab => tab.analyst === key)?.id;
+    if (selectedAnalysts.includes(key) && activeReportTab === reportId) {
+      setActiveReportTab('final_trade_decision');
+    }
     setSelectedAnalysts(prev => {
       if (prev.includes(key)) {
         return prev.length > 1 ? prev.filter(a => a !== key) : prev;
@@ -473,17 +521,22 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
       return;
     }
     setIsRunning(true);
+    setPipelineOpen(true);
+    setTelemetryOpen(true);
     setErrorMsg(null);
     setFinalRating(null);
     setElapsedSeconds(null);
     setReports({});
     setLogs([]);
-    setActiveReportTab('market_report');
+    setActiveReportTab(
+      ANALYST_REPORT_TABS.find(tab => selectedAnalysts.includes(tab.analyst))?.id
+        || 'final_trade_decision',
+    );
 
     try {
       const res = await fetch(`${TRADING_AGENT_URL}/api/trading-agent/stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           ticker: ticker.trim().toUpperCase(),
           trade_date: tradeDate,
@@ -882,7 +935,7 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
                 </div>
               )}
 
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+              <div className="trading-agent-quick-tickers" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
                 {QUICK_TICKERS.map(qt => (
                   <button
                     key={qt}
@@ -954,6 +1007,12 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
               </div>
             </div>
 
+            <details className="trading-agent-advanced">
+              <summary>
+                Advanced settings
+                <span>Models, analyst teams and debate depth</span>
+              </summary>
+              <div className="trading-agent-advanced-body">
             {/* Gemini Models Selection */}
             <div style={{ marginBottom: '14px' }}>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
@@ -1059,6 +1118,8 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
                 style={{ width: '100%' }}
               />
             </div>
+              </div>
+            </details>
 
             {/* Launch Button */}
             <button
@@ -1098,11 +1159,17 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
           </div>
 
           {/* Agent Pipeline Status Card */}
-          <div className="glass-panel trading-agent-pipeline-card" style={{ padding: '20px' }}>
-            <h3 style={{ fontSize: '0.98rem', fontWeight: 700, margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <details
+            className="glass-panel trading-agent-pipeline-card trading-agent-disclosure"
+            open={pipelineOpen}
+            onToggle={event => setPipelineOpen(event.currentTarget.open)}
+            style={{ padding: '20px' }}
+          >
+            <summary>
               <Users size={16} style={{ color: '#8b5cf6' }} />
               Agent Pipeline Status
-            </h3>
+              <span>{pipelineOpen ? 'Hide' : 'Show'}</span>
+            </summary>
             <div className="trading-agent-pipeline-teams" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {TEAM_GROUPS.map(group => (
                 <div
@@ -1158,7 +1225,7 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </details>
         </div>
 
         {/* Right Column: Final Verdict Banner + Tabbed Agent Reports + Live Telemetry */}
@@ -1200,16 +1267,16 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
 
           {/* Tabbed Report Viewer */}
           <div className="glass-panel trading-agent-report-card" style={{ padding: '22px', minHeight: '460px', minWidth: 0 }}>
+            <label className="trading-agent-report-picker">
+              <span>Report</span>
+              <select value={activeReportTab} onChange={event => setActiveReportTab(event.target.value)}>
+                {reportTabs.map(tab => (
+                  <option key={tab.id} value={tab.id}>{tab.label}</option>
+                ))}
+              </select>
+            </label>
             <div className="trading-agent-tabs" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '14px', marginBottom: '18px' }}>
-              {[
-                { id: 'final_trade_decision', label: 'Portfolio Manager Decision' },
-                { id: 'trader_investment_plan', label: 'Trader Plan' },
-                { id: 'investment_plan', label: 'Bull vs. Bear Debate' },
-                { id: 'market_report', label: 'Market / Technical' },
-                { id: 'fundamentals_report', label: 'Fundamentals' },
-                { id: 'news_report', label: 'Macro & News' },
-                { id: 'sentiment_report', label: 'Social Sentiment' },
-              ].map(tab => {
+              {reportTabs.map(tab => {
                 const isActive = activeReportTab === tab.id;
                 return (
                   <button
@@ -1315,11 +1382,17 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
           </div>
 
           {/* Live Agent Telemetry & Tool Call Stream */}
-          <div className="glass-panel trading-agent-telemetry-card" style={{ padding: '18px 22px', minWidth: 0 }}>
-            <h4 style={{ margin: '0 0 10px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <details
+            className="glass-panel trading-agent-telemetry-card trading-agent-disclosure"
+            open={telemetryOpen}
+            onToggle={event => setTelemetryOpen(event.currentTarget.open)}
+            style={{ padding: '18px 22px', minWidth: 0 }}
+          >
+            <summary>
               <Terminal size={15} style={{ color: '#38bdf8' }} />
               LIVE AGENT TELEMETRY & TOOL CALLS ({logs.length})
-            </h4>
+              <span>{telemetryOpen ? 'Hide' : 'Show'}</span>
+            </summary>
             <div
               style={{
                 height: '180px',
@@ -1359,7 +1432,7 @@ export const TradingAgent: React.FC<Props> = ({ API_BASE_URL }) => {
               )}
               <div ref={logEndRef} />
             </div>
-          </div>
+          </details>
         </div>
       </div>
     </div>
