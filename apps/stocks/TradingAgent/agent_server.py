@@ -15,8 +15,8 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 import requests
-from dotenv import load_dotenv
-from fastapi import Cookie, Depends, FastAPI, Header, HTTPException
+from dotenv import load_dotenv, set_key
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -25,14 +25,11 @@ from pydantic import BaseModel
 BASE_DIR = Path(__file__).resolve().parent
 REPO_DIR = BASE_DIR / "TradingAgents"
 ENV_FILE = BASE_DIR / ".env"
-DATA_DIR = Path(os.getenv("TRADING_AGENT_DATA_DIR", "/app/data/trading-agent" if os.getenv("RAILWAY_ENVIRONMENT_ID") else str(BASE_DIR / "data")))
+DATA_DIR = BASE_DIR / "data"
 BACKEND_CACHE_DIR = BASE_DIR.parent / "backend" / ".cache"
-BACKEND_DIR = BASE_DIR.parent / "backend"
 
 if str(REPO_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_DIR))
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
 
 # Load .env before importing tradingagents
 load_dotenv(ENV_FILE, override=False)
@@ -40,7 +37,6 @@ load_dotenv(ENV_FILE, override=False)
 from tradingagents.agents.rating import run_rating
 from tradingagents.default_config import build_default_config
 from tradingagents.graph.trading_graph import TradingAgentsGraph
-from auth import extract_bearer_token, verify_jwt
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("trading_agent_server")
@@ -71,6 +67,10 @@ GEMINI_MODELS = [
 ]
 
 
+class ApiKeyUpdateRequest(BaseModel):
+    google_api_key: str
+
+
 class AnalyzeRequest(BaseModel):
     ticker: str
     trade_date: Optional[str] = None
@@ -79,6 +79,7 @@ class AnalyzeRequest(BaseModel):
     research_depth: int = 1
     quick_think_llm: str = "gemini-3.5-flash-lite"
     deep_think_llm: str = "gemini-2.5-flash"
+    google_api_key: Optional[str] = None
 
 
 def _mask_key(key: str) -> str:
@@ -109,39 +110,6 @@ def _create_local_dev_jwt() -> str:
     return f"{h_b64}.{p_b64}.{b64url(sig)}"
 
 
-def _local_dev_token_enabled() -> bool:
-    """Allow the helper token only when a developer opts in outside Railway."""
-    enabled = os.getenv("TRADING_AGENT_LOCAL_DEV_TOKEN", "").strip().lower()
-    on_railway = any(
-        os.getenv(name)
-        for name in ("RAILWAY_ENVIRONMENT", "RAILWAY_ENVIRONMENT_ID", "RAILWAY_PROJECT_ID")
-    )
-    return enabled in {"1", "true", "yes"} and not on_railway
-
-
-def get_current_trading_user(
-    authorization: Optional[str] = Header(None),
-    ksb_sso_token: Optional[str] = Cookie(None),
-) -> Dict[str, Any]:
-    """Validate the same bearer token or SSO cookie used by the Stocks backend."""
-    token = extract_bearer_token(authorization) or ksb_sso_token
-    if not token:
-        raise HTTPException(status_code=401, detail="Authentication required. Please sign in.")
-    try:
-        return verify_jwt(token)
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid or expired authentication token.")
-
-
-def _user_data_dir(user: Dict[str, Any]) -> Path:
-    """Use a stable non-reversible folder name so users never share saved reports."""
-    subject = str(user.get("sub") or "").strip()
-    if not subject:
-        raise HTTPException(status_code=401, detail="Invalid authentication token.")
-    user_key = hashlib.sha256(subject.encode("utf-8")).hexdigest()[:32]
-    return DATA_DIR / "users" / user_key
-
-
 @app.get("/api/trading-agent/status")
 async def get_status():
     """Return microservice health, API key status, and available Gemini models."""
@@ -150,7 +118,7 @@ async def get_status():
     if env_key:
         os.environ["GOOGLE_API_KEY"] = env_key
     current_key = os.getenv("GOOGLE_API_KEY", "").strip()
-    response = {
+    return {
         "status": "online",
         "provider": "google",
         "has_google_api_key": bool(current_key),
@@ -159,16 +127,33 @@ async def get_status():
         "default_quick_llm": os.getenv("TRADINGAGENTS_QUICK_THINK_LLM", "gemini-2.5-flash"),
         "default_deep_llm": os.getenv("TRADINGAGENTS_DEEP_THINK_LLM", "gemini-2.5-flash"),
         "today": datetime.now().strftime("%Y-%m-%d"),
+        "local_dev_token": _create_local_dev_jwt(),
     }
-    if _local_dev_token_enabled():
-        response["local_dev_token"] = _create_local_dev_jwt()
-    return response
+
+
+@app.post("/api/trading-agent/config")
+async def save_api_key(req: ApiKeyUpdateRequest):
+    """Save GOOGLE_API_KEY into TradingAgent/.env and current process environment."""
+    cleaned_key = req.google_api_key.strip()
+    if not cleaned_key:
+        raise HTTPException(status_code=400, detail="Gemini API key cannot be empty.")
+
+    if not ENV_FILE.exists():
+        ENV_FILE.write_text("", encoding="utf-8")
+
+    set_key(str(ENV_FILE), "GOOGLE_API_KEY", cleaned_key)
+    os.environ["GOOGLE_API_KEY"] = cleaned_key
+    return {
+        "success": True,
+        "has_google_api_key": True,
+        "masked_google_api_key": _mask_key(cleaned_key),
+    }
 
 
 @app.get("/api/trading-agent/history")
-async def get_history(user: Dict[str, Any] = Depends(get_current_trading_user)):
-    """List only the authenticated user's saved past runs."""
-    results_root = _user_data_dir(user) / "results"
+async def get_history():
+    """List saved past runs from TradingAgent/data/results."""
+    results_root = DATA_DIR / "results"
     if not results_root.exists():
         return {"runs": []}
 
@@ -317,11 +302,19 @@ def _resolve_ticker(raw_ticker: str) -> str:
     return cleaned
 
 
-def _prepare_config(req: AnalyzeRequest, user: Dict[str, Any], resolved_ticker: str = "") -> dict:
+def _prepare_config(req: AnalyzeRequest, resolved_ticker: str = "") -> dict:
     load_dotenv(ENV_FILE, override=False)
     env_key = (os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or "").strip().strip("'\"")
     if env_key:
         os.environ["GOOGLE_API_KEY"] = env_key
+    if req.google_api_key and req.google_api_key.strip():
+        cleaned = req.google_api_key.strip()
+        os.environ["GOOGLE_API_KEY"] = cleaned
+        try:
+            set_key(str(ENV_FILE), "GOOGLE_API_KEY", cleaned)
+        except Exception:
+            pass
+
     if not os.getenv("GOOGLE_API_KEY", "").strip():
         raise ValueError("Missing GOOGLE_API_KEY environment variable on the server.")
 
@@ -337,19 +330,15 @@ def _prepare_config(req: AnalyzeRequest, user: Dict[str, Any], resolved_ticker: 
     if resolved_ticker.endswith(".NS") or resolved_ticker.endswith(".BO"):
         config["data_vendors"] = dict(config.get("data_vendors") or {})
         config["data_vendors"]["fundamental_data"] = "yfinance"
-    user_root = _user_data_dir(user)
-    config["results_dir"] = str(user_root / "results")
-    config["data_cache_dir"] = str(user_root / "cache")
-    config["memory_log_path"] = str(user_root / "memory" / "trading_memory.md")
+    config["results_dir"] = str(DATA_DIR / "results")
+    config["data_cache_dir"] = str(DATA_DIR / "cache")
+    config["memory_log_path"] = str(DATA_DIR / "memory" / "trading_memory.md")
     config["checkpoint_enabled"] = False
     return config
 
 
 @app.post("/api/trading-agent/stream")
-async def stream_analysis(
-    req: AnalyzeRequest,
-    user: Dict[str, Any] = Depends(get_current_trading_user),
-):
+async def stream_analysis(req: AnalyzeRequest):
     """Stream multi-agent execution events and live reports via Server-Sent Events (SSE)."""
     raw_ticker = req.ticker.strip().upper()
     if not raw_ticker:
@@ -362,7 +351,7 @@ async def stream_analysis(
         valid_analysts = ["market", "fundamentals"]
 
     try:
-        config = _prepare_config(req, user=user, resolved_ticker=ticker)
+        config = _prepare_config(req, resolved_ticker=ticker)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

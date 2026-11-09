@@ -379,18 +379,10 @@ h1, h2, h3, h4, h5 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-}
-
-.app-brand,
-.app-header-actions {
-  flex: 0 0 auto;
 }
 
 .nav-tabs-container {
   display: flex;
-  flex: 1 1 auto;
-  min-width: 0;
   background: rgba(255, 255, 255, 0.03);
   padding: 4px;
   border-radius: 8px;
@@ -403,10 +395,6 @@ h1, h2, h3, h4, h5 {
 }
 
 .nav-tabs-container::-webkit-scrollbar {
-  display: none;
-}
-
-.mobile-tab-picker {
   display: none;
 }
 
@@ -438,28 +426,6 @@ h1, h2, h3, h4, h5 {
 
   .stock-detail-drawer {
     width: min(640px, 92vw) !important;
-  }
-}
-
-@media (min-width: 869px) and (max-width: 1600px) {
-  .app-header {
-    flex-wrap: wrap;
-  }
-
-  .app-brand {
-    order: 1;
-  }
-
-  .app-header-actions {
-    order: 2;
-    margin-left: auto;
-  }
-
-  .nav-tabs-container {
-    order: 3;
-    flex: 1 0 100%;
-    width: 100%;
-    justify-content: center;
   }
 }
 
@@ -1520,72 +1486,6 @@ h1, h2, h3, h4, h5 {
 /* ==========================================================================
    Trading Agent Mobile & Tablet Responsiveness
    ========================================================================== */
-.trading-agent-advanced {
-  margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.42);
-}
-
-.trading-agent-advanced > summary,
-.trading-agent-disclosure > summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  list-style: none;
-  font-weight: 700;
-}
-
-.trading-agent-advanced > summary::-webkit-details-marker,
-.trading-agent-disclosure > summary::-webkit-details-marker {
-  display: none;
-}
-
-.trading-agent-advanced > summary {
-  padding: 11px 12px;
-  color: #e2e8f0;
-  font-size: 0.82rem;
-}
-
-.trading-agent-advanced > summary span {
-  margin-left: auto;
-  color: var(--text-dim);
-  font-size: 0.68rem;
-  font-weight: 500;
-}
-
-.trading-agent-advanced-body {
-  padding: 4px 12px 1px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.trading-agent-disclosure > summary {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.trading-agent-disclosure > summary > span:last-child {
-  margin-left: auto;
-  color: var(--text-dim);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.trading-agent-disclosure[open] > summary {
-  margin-bottom: 14px;
-}
-
-.trading-agent-report-picker {
-  display: none;
-}
-
-.trading-agent-table-scroll {
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
 @media (max-width: 960px) {
   .trading-agent-shell {
     padding: 16px 12px !important;
@@ -1661,36 +1561,6 @@ h1, h2, h3, h4, h5 {
     padding: 7px 12px !important;
     font-size: 0.76rem !important;
   }
-
-  .trading-agent-report-picker {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 14px;
-  }
-
-  .trading-agent-report-picker span {
-    color: var(--text-dim);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .trading-agent-report-picker select {
-    width: 100%;
-    min-height: 42px;
-    padding: 8px 10px;
-    border: 1px solid var(--border-glass);
-    border-radius: 9px;
-    background: rgba(15, 23, 42, 0.9);
-    color: #fff;
-    font-weight: 700;
-  }
-
-  .trading-agent-tabs {
-    display: none !important;
-  }
 }
 
 @media (max-width: 580px) {
@@ -1756,45 +1626,5 @@ h1, h2, h3, h4, h5 {
 
   .trading-agent-pipeline-teams {
     grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  .trading-agent-quick-tickers {
-    display: none !important;
-  }
-}
-
-/* A single labelled picker is easier to scan than eight horizontally hidden
-   navigation pills on a phone. Desktop and tablet keep the full tab strip. */
-@media (max-width: 680px) {
-  .nav-tabs-container {
-    display: none !important;
-  }
-
-  .mobile-tab-picker {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .mobile-tab-picker span {
-    color: var(--text-dim);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .mobile-tab-picker select {
-    width: 100%;
-    min-height: 42px;
-    padding: 8px 36px 8px 12px;
-    border: 1px solid var(--border-glass);
-    border-radius: 10px;
-    background: rgba(15, 23, 42, 0.92);
-    color: #fff;
-    font-family: var(--font-heading);
-    font-size: 0.88rem;
-    font-weight: 700;
   }
 }

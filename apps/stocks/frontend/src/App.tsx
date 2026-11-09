@@ -19,16 +19,6 @@ const API_BASE_URL = isLocalFrontend && window.location.port === '5173'
 
 type AppTab = 'PORTFOLIO' | 'SINGLE' | 'MF' | 'PLANNER' | 'TRADING_AGENT' | 'ADMIN' | 'LEARN' | 'GAME';
 const APP_TABS: AppTab[] = ['PORTFOLIO', 'SINGLE', 'MF', 'PLANNER', 'TRADING_AGENT', 'ADMIN', 'LEARN', 'GAME'];
-const TAB_LABELS: Record<AppTab, string> = {
-  PORTFOLIO: 'Portfolio',
-  SINGLE: 'Single Stock',
-  MF: 'Mutual Funds',
-  PLANNER: 'Smart Planner',
-  TRADING_AGENT: 'Trading Agent',
-  GAME: 'Paper Trading',
-  ADMIN: 'Admin Panel',
-  LEARN: 'Beginners Guide',
-};
 const getInitialTab = (): AppTab => {
   try {
     const savedTab = localStorage.getItem('ksb_active_tab') as AppTab | null;
@@ -186,16 +176,7 @@ function App() {
       const nav = navTabsRef.current;
       const activeTab = nav?.querySelector<HTMLButtonElement>('[data-active-tab="true"]');
       if (nav && activeTab) {
-        const visibleLeft = nav.scrollLeft;
-        const visibleRight = visibleLeft + nav.clientWidth;
-        const tabLeft = activeTab.offsetLeft;
-        const tabRight = tabLeft + activeTab.offsetWidth;
-
-        if (tabLeft < visibleLeft) {
-          nav.scrollTo({ left: Math.max(0, tabLeft - 4), behavior: 'smooth' });
-        } else if (tabRight > visibleRight) {
-          nav.scrollTo({ left: tabRight - nav.clientWidth + 4, behavior: 'smooth' });
-        }
+        nav.scrollLeft = activeTab.offsetLeft - (nav.clientWidth - activeTab.clientWidth) / 2;
       }
     }, 0);
   }, [currentTab, authChecking, userProfile]);
@@ -589,6 +570,19 @@ function App() {
         {/* Tab switch Navigation pills */}
         <div className="nav-tabs-container" ref={navTabsRef}>
           {tabs.map(tab => {
+            const labels: Record<string, string> = {
+              PORTFOLIO: 'Portfolio',
+              SINGLE: 'Single Stock',
+              MF: 'Mutual Funds',
+              PLANNER: 'Smart Planner',
+
+              GAME: 'Paper Trading',
+              ADMIN: 'Admin Panel',
+              LEARN: 'Beginners Guide',
+
+              TRADING_AGENT: 'Trading Agent',
+
+            };
             return (
               <button
                 key={tab}
@@ -608,20 +602,11 @@ function App() {
                   whiteSpace: 'nowrap'
                 }}
               >
-                {TAB_LABELS[tab]}
+                {labels[tab]}
               </button>
             );
           })}
         </div>
-
-        <label className="mobile-tab-picker">
-          <span>Current section</span>
-          <select value={currentTab} onChange={event => setCurrentTab(event.target.value as AppTab)}>
-            {tabs.map(tab => (
-              <option key={tab} value={tab}>{TAB_LABELS[tab]}</option>
-            ))}
-          </select>
-        </label>
 
         <div className="app-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           {userProfile && (
